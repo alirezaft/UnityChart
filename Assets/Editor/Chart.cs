@@ -69,6 +69,9 @@ public class Chart : VisualElement
 
         m_ZeroOnYAxisPosition = (m_MaxY / (Mathf.Abs(m_MinY) + m_MaxY)) * layout.height;
 
+        if (m_Dataset.All(item => item < 0))
+            m_ZeroOnYAxisPosition = -Mathf.Sin(180 - ((m_ArrowHeadAngle / 2) * Mathf.Deg2Rad)) * m_ArrowSideLength;
+
         painter.MoveTo(new Vector2(0, m_ZeroOnYAxisPosition));
         painter.LineTo(new Vector2(layout.width, m_ZeroOnYAxisPosition));
         
@@ -124,7 +127,7 @@ public class Chart : VisualElement
         m_Dataset.Clear();
         for (int i = 0; i < 10; i++)
         {
-            m_Dataset.Add(Random.value * -10 + (Random.value * 5));
+            m_Dataset.Add(Random.value * -10);
         }
 
         Debug.Log($"Min: {m_MinY}, Max: {m_MaxY}");
