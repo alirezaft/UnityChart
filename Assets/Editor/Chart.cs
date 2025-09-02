@@ -9,8 +9,6 @@ using UnityEngine.UIElements;
 [UxmlElement]
 public partial class Chart : VisualElement
 { 
-    //TODO: fix null reference by making all values calculated with data providers
-    private List<float> m_Dataset;
     private List<DataProvider> m_DataProviders;
 
     private float m_MinY;
@@ -26,7 +24,6 @@ public partial class Chart : VisualElement
     public Chart()
     {
         generateVisualContent += UpdateWithOldDataset;
-        m_Dataset = new List<float>();
         m_DataProviders = new List<DataProvider>();
 
         RepopulateDataset();
@@ -201,42 +198,57 @@ public partial class Chart : VisualElement
     {
         foreach (var provider in m_DataProviders)
         {
+            
             var dataset = provider.Dataset;
             var xAxisStepSize = layout.width / dataset.Length;
 
-            painter.BeginPath();
-
             painter.strokeColor = provider.Color;
-            painter.fillColor = provider.Color;
+            painter.lineWidth = 1.2f;
+            painter.fillColor = painter.fillColor = new Color(provider.Color.r, provider.Color.g, provider.Color.b, 0.3f);
 
-            painter.MoveTo(new Vector2(-Mathf.Sin(270 - ((m_ArrowHeadAngle / 2) * Mathf.Deg2Rad)) * m_ArrowSideLength,
-                m_ZeroOnYAxisPosition));
+            float startX = -Mathf.Sin(270 - ((m_ArrowHeadAngle / 2) * Mathf.Deg2Rad)) * m_ArrowSideLength;
+            float baselineY = m_ZeroOnYAxisPosition;
 
-            painter.LineTo(new Vector2(-Mathf.Sin(270 - ((m_ArrowHeadAngle / 2) * Mathf.Deg2Rad)) * m_ArrowSideLength,
-                FindValueOnCharYAxis(dataset[0], provider.MinValue, provider.MaxValue, 0, layout.height)));
+            float prevX = startX;
+            float prevY = FindValueOnCharYAxis(dataset[0], provider.MinValue, provider.MaxValue, 0, layout.height);
 
-            var previousPointX = -Mathf.Sin(270 - ((m_ArrowHeadAngle / 2) * Mathf.Deg2Rad)) * m_ArrowSideLength;
+            painter.BeginPath();
+            painter.MoveTo(new Vector2(prevX, baselineY));
+            painter.LineTo(new Vector2(prevX, prevY));
 
             for (int i = 1; i < dataset.Length; i++)
             {
-                Debug.Log($"Data point: {FindValueOnCharYAxis(dataset[i - 1], provider.MinValue, provider.MaxValue, 0, layout.height)}");
-                painter.MoveTo(new Vector2(previousPointX,
-                    FindValueOnCharYAxis(dataset[i - 1], provider.MinValue, provider.MaxValue, 0, layout.height)));
+                float currX = startX + i * xAxisStepSize;
+                float currY = FindValueOnCharYAxis(dataset[i], provider.MinValue, provider.MaxValue, 0, layout.height);
 
-                painter.LineTo(new Vector2(previousPointX + xAxisStepSize,
-                    FindValueOnCharYAxis(dataset[i], provider.MinValue, provider.MaxValue, 0, layout.height)));
-                previousPointX += xAxisStepSize;
+                bool prevAbove = prevY >= baselineY;
+                bool currAbove = currY >= baselineY;
+
+                if (prevAbove != currAbove)
+                {
+                    float t = (baselineY - prevY) / (currY - prevY);
+                    float ix = prevX + t * (currX - prevX);
+                    float iy = baselineY;
+
+                    painter.LineTo(new Vector2(ix, iy));
+                    painter.LineTo(new Vector2(prevX, baselineY));
+                    painter.Fill();
+                    painter.Stroke();
+
+                    painter.BeginPath();
+                    painter.MoveTo(new Vector2(ix, baselineY));
+                    painter.LineTo(new Vector2(ix, currY));
+                }
+                else
+                {
+                    painter.LineTo(new Vector2(currX, currY));
+                }
+
+                prevX = currX;
+                prevY = currY;
             }
 
-            painter.MoveTo(new Vector2(previousPointX,
-                FindValueOnCharYAxis(dataset[^1], provider.MinValue, provider.MaxValue, 0, layout.height)));
-            painter.LineTo(new Vector2(previousPointX, m_ZeroOnYAxisPosition));
-            painter.MoveTo(new Vector2(previousPointX, m_ZeroOnYAxisPosition));
-            // painter.strokeColor = Color.clear;
-            painter.LineTo(new Vector2(-Mathf.Sin(270 - ((m_ArrowHeadAngle / 2) * Mathf.Deg2Rad)) * m_ArrowSideLength,
-                m_ZeroOnYAxisPosition));
-
-            painter.ClosePath();
+            painter.LineTo(new Vector2(prevX, baselineY));
             painter.Fill();
             painter.Stroke();
         }
@@ -244,34 +256,34 @@ public partial class Chart : VisualElement
 
     private float FindValueOnCharYAxis(float value, float sourceMin, float sourceMax, float destinationMin, float destinationMax)
     {
-        float Ans;
         
         float t = (value - sourceMin) / (sourceMax - sourceMin);
 
         Debug.Log("Actual Y: " + (destinationMin - t * (-destinationMax + destinationMin)));
-        // Scale to [u, v] 
         return destinationMax - t * (+destinationMax - destinationMin);
  
-        // return Ans;
     }
 
     public void RepopulateDataset()
     {
         m_DataProviders.Clear();
         m_DataProviders.Add(new DataProvider(Color.green, "Test"));
-        // m_DataProviders.Add(new DataProvider(Color.red, "Test2"));
-        m_DataProviders[0].AddDataPoint(0);
-        m_DataProviders[0].AddDataPoint(2);
-        m_DataProviders[0].AddDataPoint(1);
-        // for (int i = 0; i < 50; i++)
-        // {
-        //     m_DataProviders[0].AddDataPoint(Random.value * 5);
-        // }
-        //
-        // for (int i = 0; i < 32; i++)
-        // {
-        //     m_DataProviders[1].AddDataPoint(Random.value * -5);
-        // }
+        m_DataProviders.Add(new DataProvider(Color.red, "Test2"));
+        // m_DataProviders[0].AddDataPoint(0);
+        // m_DataProviders[0].AddDataPoint(1);
+        // m_DataProviders[0].AddDataPoint(3);
+        // m_DataProviders[0].AddDataPoint(-2);
+        
+        // m_DataProviders[0].AddDataPoint(-3);
+        for (int i = 0; i < 50; i++)
+        {
+            m_DataProviders[0].AddDataPoint(Random.Range(-2, 2) * 5);
+        }
+        
+        for (int i = 0; i < 32; i++)
+        {
+            m_DataProviders[1].AddDataPoint(Random.value * -5);
+        }
 
         MarkDirtyRepaint();
     }
