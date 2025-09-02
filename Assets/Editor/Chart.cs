@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class Chart : VisualElement
-{
+[UxmlElement]
+public partial class Chart : VisualElement
+{ 
     //TODO: fix null reference by making all values calculated with data providers
     private List<float> m_Dataset;
     private List<DataProvider> m_DataProviders;
@@ -205,7 +207,7 @@ public class Chart : VisualElement
             painter.BeginPath();
 
             painter.strokeColor = provider.Color;
-            painter.fillColor = new Color(provider.Color.r, provider.Color.g, provider.Color.b, 0.5f);
+            painter.fillColor = provider.Color;
 
             painter.MoveTo(new Vector2(-Mathf.Sin(270 - ((m_ArrowHeadAngle / 2) * Mathf.Deg2Rad)) * m_ArrowSideLength,
                 m_ZeroOnYAxisPosition));
@@ -245,25 +247,31 @@ public class Chart : VisualElement
         float Ans;
         
         float t = (value - sourceMin) / (sourceMax - sourceMin);
-        Ans = destinationMax + (1 - t) * (destinationMin - destinationMax);
 
-        return Ans;
+        Debug.Log("Actual Y: " + (destinationMin - t * (-destinationMax + destinationMin)));
+        // Scale to [u, v] 
+        return destinationMax - t * (+destinationMax - destinationMin);
+ 
+        // return Ans;
     }
 
     public void RepopulateDataset()
     {
         m_DataProviders.Clear();
         m_DataProviders.Add(new DataProvider(Color.green, "Test"));
-        m_DataProviders.Add(new DataProvider(Color.red, "Test2"));
-        for (int i = 0; i < 50; i++)
-        {
-            m_DataProviders[0].AddDataPoint(Random.value * -10 + Random.value * 7);
-        }
-        
-        for (int i = 0; i < 32; i++)
-        {
-            m_DataProviders[1].AddDataPoint(Random.value * -10 + Random.value * 7);
-        }
+        // m_DataProviders.Add(new DataProvider(Color.red, "Test2"));
+        m_DataProviders[0].AddDataPoint(0);
+        m_DataProviders[0].AddDataPoint(2);
+        m_DataProviders[0].AddDataPoint(1);
+        // for (int i = 0; i < 50; i++)
+        // {
+        //     m_DataProviders[0].AddDataPoint(Random.value * 5);
+        // }
+        //
+        // for (int i = 0; i < 32; i++)
+        // {
+        //     m_DataProviders[1].AddDataPoint(Random.value * -5);
+        // }
 
         MarkDirtyRepaint();
     }
@@ -271,9 +279,5 @@ public class Chart : VisualElement
     public void AddDataProvider(DataProvider provider)
     {
         m_DataProviders.Add(provider);
-    }
-
-    public new class UxmlFactory : UxmlFactory<Chart, UxmlTraits>
-    {
     }
 }
