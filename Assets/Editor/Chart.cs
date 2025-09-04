@@ -145,7 +145,7 @@ public partial class Chart : VisualElement
 
         foreach (var provider in m_DataProviders)
         {
-            answer = answer & provider.Dataset.ToList().TrueForAll(item => item < 0);
+            answer = answer & provider.Dataset.TrueForAll(item => item < 0);
         }
 
         return answer;
@@ -200,7 +200,7 @@ public partial class Chart : VisualElement
         {
             
             var dataset = provider.Dataset;
-            var xAxisStepSize = layout.width / dataset.Length;
+            var xAxisStepSize = layout.width / dataset.Count;
 
             painter.strokeColor = provider.Color;
             painter.lineWidth = 1.2f;
@@ -216,7 +216,7 @@ public partial class Chart : VisualElement
             painter.MoveTo(new Vector2(prevX, baselineY));
             painter.LineTo(new Vector2(prevX, prevY));
 
-            for (int i = 1; i < dataset.Length; i++)
+            for (int i = 1; i < dataset.Count; i++)
             {
                 float currX = startX + i * xAxisStepSize;
                 float currY = FindValueOnCharYAxis(dataset[i], provider.MinValue, provider.MaxValue, 0, layout.height);
@@ -280,7 +280,7 @@ public partial class Chart : VisualElement
             m_DataProviders[0].AddDataPoint(Random.Range(-2, 2) * 5);
         }
         
-        for (int i = 0; i < 32; i++)
+        for (int i = 0; i < 50; i++)
         {
             m_DataProviders[1].AddDataPoint(Random.value * -5);
         }
