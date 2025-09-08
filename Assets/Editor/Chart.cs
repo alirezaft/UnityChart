@@ -219,7 +219,7 @@ namespace UnityChart
             foreach (var provider in m_DataProviders)
             {
                 var latestPointOnXAxis = 0f;
-                var xSteps = layout.width / provider.Length;
+                var xSteps = layout.width / (provider.Length - 1);
 
                 painter.BeginPath();
                 painter.strokeColor = provider.Color;
@@ -351,7 +351,7 @@ namespace UnityChart
         {
             m_DataProviders.Clear();
             m_DataProviders.Add(new DataProvider(Color.green, "Test"));
-            m_DataProviders[0].Dataset = new List<float>() { 2, -1, 3 };
+            m_DataProviders[0].Dataset = new List<float>() { 2, -1, 3, -2, 1, -3};
             // m_DataProviders.Add(new DataProvider(Color.red, "Test2"));
             // m_DataProviders[0].AddDataPoint(0);
             // m_DataProviders[0].AddDataPoint(1);
