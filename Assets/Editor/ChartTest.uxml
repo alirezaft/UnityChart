@@ -1,3 +1,5 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <Chart style="height: 178px;" />
+<ui:UXML xmlns:chart="UnityChart" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Label text="9999" style="position: absolute; top: 67px; left: 70px; font-size: 6px; color: rgb(255, 255, 255); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+    <ui:Label text="9" style="position: absolute; top: 51px; left: 80px; font-size: 6px; color: rgb(255, 255, 255); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+    <chart:Chart style="height: 178px; left: 0;" />
 </ui:UXML>
