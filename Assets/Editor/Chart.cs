@@ -124,9 +124,9 @@ namespace UnityChart
 
         private void DrawVerticalAxisLine(Painter2D painter)
         {
-            painter.MoveTo(new Vector2(-Mathf.Sin(270 - ((m_ArrowHeadAngle / 2) * Mathf.Deg2Rad)) * m_ArrowSideLength,
+            painter.MoveTo(new Vector2(0,
                 0));
-            painter.LineTo(new Vector2(-Mathf.Sin(270 - ((m_ArrowHeadAngle / 2) * Mathf.Deg2Rad)) * m_ArrowSideLength,
+            painter.LineTo(new Vector2(0,
                 layout.height));
         }
 
@@ -230,7 +230,6 @@ namespace UnityChart
                     AreAllElementsPositive() ? 0 : provider.MinValue,
                     AreAllElementsNegative() ? 0 : provider.MaxValue, 0, layout.height);
 
-                Debug.Log($"0Pos: {m_ZeroOnYAxisPosition}, DataPos: {YPos}");
 
                 painter.LineTo(new Vector2(0, YPos));
                 currPos = new Vector2(0, YPos);
@@ -287,23 +286,30 @@ namespace UnityChart
             var length = m_DataProviders[0].Length;
             var numOfDigits = Utils.GetNumberOfDigits(length);
 
+            var niceScaleX = new NiceScale(1, length, true);
+            var niceScaleY = new NiceScale(m_MinY, m_MaxY, false);
+
+            var xTicks = niceScaleX.GetTicks();
+            
             var pixelsForLargestLabel = Utils.EstimateLabelLengthInPixels(numOfDigits);
-            Debug.Log($"numPixels: {pixelsForLargestLabel}");
             var maxTicksPossible = layout.width / pixelsForLargestLabel;
+            // niceScaleX.SetMaxTicks(maxTicksPossible);
 
             var rangeY = Utils.FindMaxAmongAllDataProviders(m_DataProviders) -
                          Utils.FindMinAmongAllDataProviders(m_DataProviders);
-            var stepSizeX = Utils.GetNiceStep(length, (int)maxTicksPossible);
-            Debug.Log($"maxticks: {maxTicksPossible}, range: {length}, stepsize: {stepSizeX}");
+            var stepSizeX = length / niceScaleX.TickSpacing;
 
             var numberOfTicksX = length / stepSizeX;
+            Debug.Log($"Tick Params: Length: {length}, step size: {stepSizeX}");
 
-            PlaceTicksOnXAxis((int)numberOfTicksX, painter);
+            PlaceTicksOnXAxis(xTicks, painter);
         }
 
-        private void PlaceTicksOnXAxis(int numberOfTicks, Painter2D painter)
+        private void PlaceTicksOnXAxis(List<float> ticksList, Painter2D painter)
         {
-            Debug.Log(numberOfTicks);
+            var numberOfTicks = ticksList.Count;
+            
+            Debug.Log("Num of Ticks: " + numberOfTicks);
             var tickDistance = layout.width / numberOfTicks;
             var painterMovementVector = new Vector2(tickDistance, -m_TickLength);
             var tickLengthVector = new Vector2(0, m_TickLength);
@@ -341,7 +347,6 @@ namespace UnityChart
             // yMidpoint = t > yMidpoint ? -yMidpoint : yMidpoint;
             t = t < yMidpoint ? (2 * (yMidpoint - t)) + t : t - (2 * (t - yMidpoint));
 
-            Debug.Log($"Chartval: {t} for value: {value}");
 
             return Mathf.Abs(t);
             // return destinationMax - t * (+destinationMax - destinationMin);
@@ -351,7 +356,7 @@ namespace UnityChart
         {
             m_DataProviders.Clear();
             m_DataProviders.Add(new DataProvider(Color.green, "Test"));
-            m_DataProviders[0].Dataset = new List<float>() { 2, -1, 3, -2, 1, -3};
+            // m_DataProviders[0].Dataset = new List<float>() { 1, 0, 1, 2, -3, 5};
             // m_DataProviders.Add(new DataProvider(Color.red, "Test2"));
             // m_DataProviders[0].AddDataPoint(0);
             // m_DataProviders[0].AddDataPoint(1);
@@ -361,16 +366,16 @@ namespace UnityChart
             // m_DataProviders[0].AddDataPoint(-3);
             StringBuilder builder = new StringBuilder();
             builder.Append("Dataset 1: [");
-            foreach (var f in m_DataProviders[0].Dataset)
-            {
-                builder.Append(f + ", ");
-            }
-
-            // for (int i = 0; i < 3; i++)
+            // foreach (var f in m_DataProviders[0].Dataset)
             // {
-            //     m_DataProviders[0].AddDataPoint(Random.Range(-2, 2) * 5);
-            //     builder.Append(m_DataProviders[0].Dataset[i] + ", ");
+            //     builder.Append(f + ", ");
             // }
+
+            for (int i = 0; i < 20; i++)
+            {
+                m_DataProviders[0].AddDataPoint(Random.value * -1);
+                builder.Append(m_DataProviders[0].Dataset[i] + ", ");
+            }
 
             builder.Append("]");
 

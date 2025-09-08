@@ -85,7 +85,7 @@ namespace UnityChart
         public static bool DoValuesHaveDifferentSigns(float n, float m)
         {
             Debug.Log($"values: {n}, {m} diff sign? {n * m<0}");
-            return n * m < 0; 
+            return n * m <= 0; 
         }
         
     }
