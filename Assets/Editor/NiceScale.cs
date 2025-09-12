@@ -96,7 +96,7 @@ namespace UnityChart{
             var numberOfNumbers = (int)(NiceMax - NiceMin) / TickSpacing;
             
             
-            for (int i = 0; i < numberOfNumbers; i++)
+            for (int i = 0; i <= numberOfNumbers; i++)
             {
                 result.Add(NiceMin + (i * TickSpacing));
                 // sb.Append($"{val}, ");

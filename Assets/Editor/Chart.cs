@@ -371,7 +371,7 @@ namespace UnityChart
 
         private void PlaceTicksOnYAxis(List<float> ticks, Painter2D painter)
         {
-            var tickDistance = layout.height / ticks.Count;
+            var tickDistance = layout.height / (ticks.Count - 1);
             var tickVector = new Vector2(m_TickLength, 0);
             var painterStepVector = new Vector2(-m_TickLength, -tickDistance);
             
@@ -393,13 +393,13 @@ namespace UnityChart
 
         private void PlaceYAxisTickLabels(List<float> ticks, MeshGenerationContext context)
         {
-            var labelDistance = layout.height / ticks.Count;
+            var labelDistance = layout.height / (ticks.Count - 1);
             var painterMovementVector = new Vector2(0, -labelDistance);
             var currPos = new Vector2(0, layout.height);
 
             for (int i = 0; i < ticks.Count; i++)
             {
-                context.DrawText(ticks[i].ToString(), currPos, m_FontSize, Color.white);
+                context.DrawText(ticks[i].ToString(), currPos + new Vector2(0, -1.1f * m_FontSize / 2), m_FontSize, Color.white);
                 currPos += painterMovementVector;
             }
         }
