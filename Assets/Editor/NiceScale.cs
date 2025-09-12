@@ -32,8 +32,9 @@ namespace UnityChart{
         {
             range = NiceNum(maxPoint - minPoint, false, false);
             tickSpacing = NiceNum(range / (maxTicks - 1f), true, atLeastOne);
-            niceMin = Mathf.Floor(minPoint / tickSpacing) * tickSpacing;
+            niceMin = atLeastOne ? 1 : Mathf.Floor(minPoint / tickSpacing) * tickSpacing;
             niceMax = Mathf.Ceil(maxPoint / tickSpacing) * tickSpacing;
+            niceMax = atLeastOne ? niceMax + 1 : niceMax;
         }
 
         /// <summary>
@@ -88,16 +89,20 @@ namespace UnityChart{
         public List<float> GetTicks()
         {
             List<float> result = new List<float>();
-
+            // var initialVal = atLeastOne ? 1 : NiceMin;
+            
             StringBuilder sb = new StringBuilder();
             sb.Append("Ticks: [");
-            for (float val = NiceMin; val <= NiceMax - TickSpacing; val += TickSpacing)
+            var numberOfNumbers = (int)(NiceMax - NiceMin) / TickSpacing;
+            
+            
+            for (int i = 0; i < numberOfNumbers; i++)
             {
-                result.Add(val);
-                sb.Append($"{val}, ");
+                result.Add(NiceMin + (i * TickSpacing));
+                // sb.Append($"{val}, ");
             }
 
-            sb.Append("]");
+            sb.Append("], Spacing: " + TickSpacing);
             Debug.Log(sb.ToString());
             return result;
         }

@@ -12,7 +12,7 @@ namespace UnityChart
             return (int)Math.Floor(Math.Log10(n) + 1);;
         }
 
-        public static float EstimateLabelLengthInPixels(int length)
+        public static float EstimateLabelLengthInPixels(int length, float fontSize)
         {
             return Mathf.Round(4.25f * length);
         }
@@ -84,7 +84,6 @@ namespace UnityChart
 
         public static bool DoValuesHaveDifferentSigns(float n, float m)
         {
-            Debug.Log($"values: {n}, {m} diff sign? {n * m<0}");
             return n * m <= 0; 
         }
         

@@ -24,6 +24,7 @@ namespace UnityChart
         private float m_ArrowSideLength = 10f;
         private float m_ArrowHeadAngle = 30f;
         private float m_TickLength = 6f;
+        private float m_FontSize = 10f;
 
         public Chart()
         {
@@ -93,7 +94,7 @@ namespace UnityChart
             CalculateMinAndMaxValues();
             DrawChartAxis(painter);
             DrawDataGraphs(painter);
-            DrawTicks(painter);
+            DrawTicks(painter, ctx);
         }
 
         private void DrawChartAxis(Painter2D painter)
@@ -220,6 +221,7 @@ namespace UnityChart
             {
                 var latestPointOnXAxis = 0f;
                 var xSteps = layout.width / (provider.Length - 1);
+                Debug.Log($"data steps x2 {xSteps}");
 
                 painter.BeginPath();
                 painter.strokeColor = provider.Color;
@@ -281,7 +283,7 @@ namespace UnityChart
             return new Vector2((m_ZeroOnYAxisPosition - yIntercept.x) / slope, m_ZeroOnYAxisPosition);
         }
 
-        private void DrawTicks(Painter2D painter)
+        private void DrawTicks(Painter2D painter, MeshGenerationContext context)
         {
             var length = m_DataProviders[0].Length;
             var numOfDigits = Utils.GetNumberOfDigits(length);
@@ -290,9 +292,12 @@ namespace UnityChart
             var niceScaleY = new NiceScale(m_MinY, m_MaxY, false);
 
             var xTicks = niceScaleX.GetTicks();
-            
-            var pixelsForLargestLabel = Utils.EstimateLabelLengthInPixels(numOfDigits);
-            var maxTicksPossible = layout.width / pixelsForLargestLabel;
+            var yTicks = niceScaleY.GetTicks();
+
+            var pixelsForLargestLabel = Utils.EstimateLabelLengthInPixels(numOfDigits, m_FontSize);
+            var maxXTicksPossible = layout.width / pixelsForLargestLabel;
+            var maxYTicksPossible = layout.height / (m_FontSize * 2);
+            niceScaleY.SetMaxTicks(10);
             // niceScaleX.SetMaxTicks(maxTicksPossible);
 
             var rangeY = Utils.FindMaxAmongAllDataProviders(m_DataProviders) -
@@ -302,15 +307,24 @@ namespace UnityChart
             var numberOfTicksX = length / stepSizeX;
             Debug.Log($"Tick Params: Length: {length}, step size: {stepSizeX}");
 
-            PlaceTicksOnXAxis(xTicks, painter);
+            // PlaceTicksOnXAxis(xTicks, painter);
+            // PlaceXAxisTickLabels(xTicks, context);
+            PlaceTicksOnYAxis(yTicks, painter);
+            PlaceYAxisTickLabels(yTicks, context);
+            
         }
 
         private void PlaceTicksOnXAxis(List<float> ticksList, Painter2D painter)
         {
-            var numberOfTicks = ticksList.Count;
-            
+            var numberOfTicks = ticksList.Count - 1;
+
+            var dataSteps = layout.width / (m_DataProviders[0].Length - 1);
+            var dataToTickRatio = ((float)m_DataProviders[0].Length - 1) / (ticksList.Count - 1);
+
+
             Debug.Log("Num of Ticks: " + numberOfTicks);
-            var tickDistance = layout.width / numberOfTicks;
+            var tickDistance = dataSteps * dataToTickRatio;
+            Debug.Log($"Tick distance: {tickDistance}");
             var painterMovementVector = new Vector2(tickDistance, -m_TickLength);
             var tickLengthVector = new Vector2(0, m_TickLength);
             var currPosition = new Vector2(0, m_ZeroOnYAxisPosition) + tickLengthVector;
@@ -332,6 +346,64 @@ namespace UnityChart
             }
         }
 
+        private void PlaceXAxisTickLabels(List<float> ticks, MeshGenerationContext context)
+        {
+            var numberOfLabels = ticks.Count;
+            var dataSteps = layout.width / (m_DataProviders[0].Length - 1);
+            var dataToTickRatio = ((float)m_DataProviders[0].Length - 1) / (ticks.Count - 1);
+            var labelPositionStep = dataSteps * dataToTickRatio;
+
+            for (int i = 0; i < ticks.Count; i++)
+            {
+                var labelContent = (int)ticks[i];
+                var labelPosition =
+                    new Vector2(i * labelPositionStep,
+                        m_ZeroOnYAxisPosition);
+                var labelAdjustmentVector = new Vector2(-(((int)Mathf.Log10(labelContent) + 1) * m_FontSize) / 2, 4);
+                
+                labelPosition += i == ticks.Count - 1
+                    ? new Vector2(labelAdjustmentVector.x * 2, labelAdjustmentVector.y)
+                    : labelAdjustmentVector;
+
+                context.DrawText(labelContent.ToString(), labelPosition, m_FontSize, Color.white);
+            }
+        }
+
+        private void PlaceTicksOnYAxis(List<float> ticks, Painter2D painter)
+        {
+            var tickDistance = layout.height / ticks.Count;
+            var tickVector = new Vector2(m_TickLength, 0);
+            var painterStepVector = new Vector2(-m_TickLength, -tickDistance);
+            
+            var currPos = new Vector2(0, layout.height);
+            painter.MoveTo(currPos);
+
+            for (int i = 0; i < ticks.Count; i++)
+            {
+                painter.BeginPath();
+                painter.strokeColor = Color.white;
+                painter.MoveTo(currPos + painterStepVector);
+                currPos += painterStepVector;
+                painter.LineTo(currPos + tickVector * 1.5f);
+                currPos += tickVector;
+                painter.Stroke();
+                painter.ClosePath();
+            }
+        }
+
+        private void PlaceYAxisTickLabels(List<float> ticks, MeshGenerationContext context)
+        {
+            var labelDistance = layout.height / ticks.Count;
+            var painterMovementVector = new Vector2(0, -labelDistance);
+            var currPos = new Vector2(0, layout.height);
+
+            for (int i = 0; i < ticks.Count; i++)
+            {
+                context.DrawText(ticks[i].ToString(), currPos, m_FontSize, Color.white);
+                currPos += painterMovementVector;
+            }
+        }
+
         private float FindValueOnChartYAxis(float value, float sourceMin, float sourceMax, float destinationMin,
             float destinationMax)
         {
@@ -339,7 +411,7 @@ namespace UnityChart
             // {
             //     (sourceMax, sourceMin) = (sourceMin, sourceMax);
             // }
-            
+
             var t = value - sourceMin;
             t = t / (sourceMax - sourceMin) * (destinationMax - destinationMin);
 
@@ -356,7 +428,7 @@ namespace UnityChart
         {
             m_DataProviders.Clear();
             m_DataProviders.Add(new DataProvider(Color.green, "Test"));
-            // m_DataProviders[0].Dataset = new List<float>() { 1, 0, 1, 2, -3, 5};
+            // m_DataProviders[0].Dataset = new List<float>() { 1, 0, 1, 2, -3, 5 };
             // m_DataProviders.Add(new DataProvider(Color.red, "Test2"));
             // m_DataProviders[0].AddDataPoint(0);
             // m_DataProviders[0].AddDataPoint(1);
@@ -370,10 +442,10 @@ namespace UnityChart
             // {
             //     builder.Append(f + ", ");
             // }
-
-            for (int i = 0; i < 20; i++)
+            //
+            for (int i = 0; i < 4; i++)
             {
-                m_DataProviders[0].AddDataPoint(Random.value * -1);
+                m_DataProviders[0].AddDataPoint(i % 2);
                 builder.Append(m_DataProviders[0].Dataset[i] + ", ");
             }
 
