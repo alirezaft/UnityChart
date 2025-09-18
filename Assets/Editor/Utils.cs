@@ -54,11 +54,11 @@ namespace UnityChart
 
         public static float FindMaxAmongAllDataProviders(List<DataProvider> providers)
         {
-            var ans = 0f;
+            var ans = providers[0].MaxValue;
 
-            foreach (var p in providers)
+            for(int i = 1; i < providers.Count; i++)
             {
-                var providerMax = p.MaxValue;
+                var providerMax = providers[i].MaxValue;
                 
                 if (ans < providerMax)
                     ans = providerMax;
@@ -69,13 +69,13 @@ namespace UnityChart
         
         public static float FindMinAmongAllDataProviders(List<DataProvider> providers)
         {
-            var ans = 0f;
+            var ans = providers[0].MinValue;
 
-            foreach (var p in providers)
+            for(int i = 1; i < providers.Count; i++)
             {
-                var providerMax = p.MinValue;
+                var providerMax = providers[i].MinValue;
                 
-                if (ans < providerMax)
+                if (ans > providerMax)
                     ans = providerMax;
             }
 

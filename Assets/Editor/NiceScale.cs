@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace UnityChart{
+namespace UnityChart
+{
     public class NiceScale
     {
         private float minPoint;
@@ -30,11 +31,21 @@ namespace UnityChart{
         /// </summary>
         private void Calculate()
         {
-            range = NiceNum(maxPoint - minPoint, false, false);
+            range = NiceNum(Mathf.Abs(maxPoint - minPoint), false, false); // ensure positive range
             tickSpacing = NiceNum(range / (maxTicks - 1f), true, atLeastOne);
-            niceMin = atLeastOne ? 1 : Mathf.Floor(minPoint / tickSpacing) * tickSpacing;
-            niceMax = Mathf.Ceil(maxPoint / tickSpacing) * tickSpacing;
-            niceMax = atLeastOne ? niceMax + 1 : niceMax;
+
+            if (atLeastOne)
+            {
+                // Clamp min at 1 if requested
+                niceMin = Mathf.Max(1, Mathf.Floor(minPoint / tickSpacing) * tickSpacing);
+                niceMax = Mathf.Ceil(maxPoint / tickSpacing) * tickSpacing;
+                if (niceMax == niceMin) niceMax += 1; // ensure at least one tick
+            }
+            else
+            {
+                niceMin = Mathf.Floor(minPoint / tickSpacing) * tickSpacing;
+                niceMax = Mathf.Ceil(maxPoint / tickSpacing) * tickSpacing;
+            }
         }
 
         /// <summary>
@@ -42,6 +53,8 @@ namespace UnityChart{
         /// </summary>
         private float NiceNum(float range, bool round, bool atLeastOne)
         {
+            if (range == 0) return 0;
+
             float exponent = Mathf.Floor(Mathf.Log10(range));
             float fraction = range / Mathf.Pow(10f, exponent);
             float niceFraction;
@@ -85,29 +98,23 @@ namespace UnityChart{
             this.maxTicks = maxTicks;
             Calculate();
         }
-        
+
         public List<float> GetTicks()
         {
             List<float> result = new List<float>();
-            // var initialVal = atLeastOne ? 1 : NiceMin;
-            
-            StringBuilder sb = new StringBuilder();
-            sb.Append("Ticks: [");
-            var numberOfNumbers = (int)(NiceMax - NiceMin) / TickSpacing;
-            
-            
+
+            int numberOfNumbers = Mathf.RoundToInt((niceMax - niceMin) / tickSpacing);
+
             for (int i = 0; i <= numberOfNumbers; i++)
             {
-                result.Add(NiceMin + (i * TickSpacing));
-                // sb.Append($"{val}, ");
+                result.Add(niceMin + (i * tickSpacing));
             }
 
-            sb.Append("], Spacing: " + TickSpacing);
-            Debug.Log(sb.ToString());
+            Debug.Log($"Ticks: [{string.Join(", ", result)}], Spacing: {tickSpacing}");
             return result;
         }
 
-        // Public properties to use outside
+        // Public properties
         public float TickSpacing => tickSpacing;
         public float NiceMin => niceMin;
         public float NiceMax => niceMax;

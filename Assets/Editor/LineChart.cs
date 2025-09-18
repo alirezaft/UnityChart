@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 namespace UnityChart
 {
     [UxmlElement]
-    public partial class Chart : VisualElement
+    public partial class LineChart : VisualElement
     {
         private List<DataProvider> m_DataProviders;
 
@@ -18,6 +18,8 @@ namespace UnityChart
         private float m_MaxY;
         private float m_MinX = 0;
         private float m_MaxX;
+        private float m_NiceMaxY;
+        private float m_NiceMinY;
 
         private float m_ZeroOnYAxisPosition;
 
@@ -26,7 +28,7 @@ namespace UnityChart
         private float m_TickLength = 6f;
         private float m_FontSize = 10f;
 
-        public Chart()
+        public LineChart()
         {
             generateVisualContent += UpdateWithOldDataset;
             m_DataProviders = new List<DataProvider>();
@@ -36,33 +38,9 @@ namespace UnityChart
 
         private void CalculateMinAndMaxValues()
         {
-            CalculateMaxY();
-            CalculateMinY();
+            m_MaxY = Utils.FindMaxAmongAllDataProviders(m_DataProviders);
+            m_MinY = Utils.FindMinAmongAllDataProviders(m_DataProviders);
             CalculateMaxX();
-        }
-
-        private void CalculateMaxY()
-        {
-            var answer = float.NegativeInfinity;
-            foreach (var provider in m_DataProviders)
-            {
-                if (provider.MaxValue > answer)
-                    answer = provider.MaxValue;
-            }
-
-            m_MaxY = answer;
-        }
-
-        private void CalculateMinY()
-        {
-            var answer = float.PositiveInfinity;
-            foreach (var provider in m_DataProviders)
-            {
-                if (provider.MinValue < answer)
-                    answer = provider.MinValue;
-            }
-
-            m_MinY = answer;
         }
 
         private void CalculateMaxX()
@@ -86,15 +64,12 @@ namespace UnityChart
 
         private void UpdateWithOldDataset(MeshGenerationContext ctx)
         {
-            var chartHeight = layout.height;
-            var chartWidth = layout.width;
-
             var painter = ctx.painter2D;
 
             CalculateMinAndMaxValues();
             DrawChartAxis(painter);
-            DrawDataGraphs(painter);
             DrawTicks(painter, ctx);
+            DrawDataGraphs(painter);
         }
 
         private void DrawChartAxis(Painter2D painter)
@@ -125,14 +100,22 @@ namespace UnityChart
 
         private void DrawVerticalAxisLine(Painter2D painter)
         {
+            var originalWidth = painter.lineWidth;
+            painter.lineWidth = 1f;
+
             painter.MoveTo(new Vector2(0,
                 0));
             painter.LineTo(new Vector2(0,
                 layout.height));
+
+            painter.lineWidth = originalWidth;
         }
 
         private void DrawHorizontalAxisLine(Painter2D painter)
         {
+            var originalWidth = painter.lineWidth;
+            painter.lineWidth = 1f;
+
             m_ZeroOnYAxisPosition = (m_MaxY / (Mathf.Abs(m_MinY) + m_MaxY)) * layout.height;
 
             if (AreAllElementsNegative())
@@ -146,6 +129,7 @@ namespace UnityChart
 
             painter.MoveTo(new Vector2(0, m_ZeroOnYAxisPosition));
             painter.LineTo(new Vector2(layout.width, m_ZeroOnYAxisPosition));
+            painter.lineWidth = originalWidth;
         }
 
         private bool AreAllElementsNegative()
@@ -224,13 +208,14 @@ namespace UnityChart
                 Debug.Log($"data steps x2 {xSteps}");
 
                 painter.BeginPath();
+                painter.lineWidth = 1.5f;
                 painter.strokeColor = provider.Color;
                 painter.fillColor = new Color(provider.Color.r, provider.Color.g, provider.Color.b, 0.3f);
                 painter.MoveTo(new Vector2(0, m_ZeroOnYAxisPosition));
                 var currPos = new Vector2(0, m_ZeroOnYAxisPosition);
                 var YPos = FindValueOnChartYAxis(provider.Dataset[0],
-                    AreAllElementsPositive() ? 0 : provider.MinValue,
-                    AreAllElementsNegative() ? 0 : provider.MaxValue, 0, layout.height);
+                    m_NiceMinY,
+                    m_NiceMaxY, 0, layout.height);
 
 
                 painter.LineTo(new Vector2(0, YPos));
@@ -239,8 +224,8 @@ namespace UnityChart
 
                 for (int i = 1; i < dataset.Count; i++)
                 {
-                    var dataPointY = FindValueOnChartYAxis(dataset[i], AreAllElementsPositive() ? 0 : provider.MinValue,
-                        AreAllElementsNegative() ? 0 : provider.MaxValue,
+                    var dataPointY = FindValueOnChartYAxis(dataset[i], AreAllElementsPositive() ? 0 : m_NiceMinY,
+                        AreAllElementsNegative() ? 0 : m_NiceMaxY,
                         0, layout.height);
 
                     if (Utils.DoValuesHaveDifferentSigns(dataset[i], dataset[i - 1]))
@@ -272,6 +257,8 @@ namespace UnityChart
                 painter.Stroke();
                 painter.Fill();
             }
+
+            painter.lineWidth = 2;
         }
 
         private Vector2 FindIntersectionWithXAxis(Vector2 point1, Vector2 point2)
@@ -299,7 +286,10 @@ namespace UnityChart
             var maxYTicksPossible = layout.height / (m_FontSize * 2);
             niceScaleY.SetMaxTicks(10);
             // niceScaleX.SetMaxTicks(maxTicksPossible);
-
+            m_NiceMaxY = niceScaleY.NiceMax;
+            m_NiceMinY = niceScaleY.NiceMin;
+            Debug.Log($"Min: {m_NiceMinY}, Max: {m_NiceMaxY}");
+            
             var rangeY = Utils.FindMaxAmongAllDataProviders(m_DataProviders) -
                          Utils.FindMinAmongAllDataProviders(m_DataProviders);
             var stepSizeX = length / niceScaleX.TickSpacing;
@@ -311,7 +301,6 @@ namespace UnityChart
             // PlaceXAxisTickLabels(xTicks, context);
             PlaceTicksOnYAxis(yTicks, painter);
             PlaceYAxisTickLabels(yTicks, context);
-            
         }
 
         private void PlaceTicksOnXAxis(List<float> ticksList, Painter2D painter)
@@ -360,7 +349,7 @@ namespace UnityChart
                     new Vector2(i * labelPositionStep,
                         m_ZeroOnYAxisPosition);
                 var labelAdjustmentVector = new Vector2(-(((int)Mathf.Log10(labelContent) + 1) * m_FontSize) / 2, 4);
-                
+
                 labelPosition += i == ticks.Count - 1
                     ? new Vector2(labelAdjustmentVector.x * 2, labelAdjustmentVector.y)
                     : labelAdjustmentVector;
@@ -374,7 +363,7 @@ namespace UnityChart
             var tickDistance = layout.height / (ticks.Count - 1);
             var tickVector = new Vector2(m_TickLength, 0);
             var painterStepVector = new Vector2(-m_TickLength, -tickDistance);
-            
+
             var currPos = new Vector2(0, layout.height);
             painter.MoveTo(currPos);
 
@@ -399,7 +388,8 @@ namespace UnityChart
 
             for (int i = 0; i < ticks.Count; i++)
             {
-                context.DrawText(ticks[i].ToString(), currPos + new Vector2(0, -1.1f * m_FontSize / 2), m_FontSize, Color.white);
+                context.DrawText(ticks[i].ToString(), currPos + new Vector2(0, -1.1f * m_FontSize / 2), m_FontSize,
+                    Color.white);
                 currPos += painterMovementVector;
             }
         }
@@ -443,9 +433,9 @@ namespace UnityChart
             //     builder.Append(f + ", ");
             // }
             //
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 20; i++)
             {
-                m_DataProviders[0].AddDataPoint(i % 2);
+                m_DataProviders[0].AddDataPoint((Random.value * 1003) - 400);
                 builder.Append(m_DataProviders[0].Dataset[i] + ", ");
             }
 

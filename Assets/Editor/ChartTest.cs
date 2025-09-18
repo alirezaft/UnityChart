@@ -28,7 +28,7 @@ namespace UnityChart.Test
         [MenuItem("UChart/Repopulatedataset")]
         public static void RepopulateTestData()
         {
-            root.Q<Chart>().RepopulateDataset();
+            root.Q<LineChart>().RepopulateDataset(); 
         }
     }
 }
