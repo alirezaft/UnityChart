@@ -229,8 +229,8 @@ namespace UnityChart
 
                 for (int i = 1; i < dataset.Count; i++)
                 {
-                    var dataPointY = FindValueOnChartYAxis(dataset[i], AreAllElementsPositive() ? 0 : m_NiceMinY,
-                        AreAllElementsNegative() ? 0 : m_NiceMaxY,
+                    var dataPointY = FindValueOnChartYAxis(dataset[i], m_NiceMinY,
+                        m_NiceMaxY,
                         0, layout.height);
 
                     if (Utils.DoValuesHaveDifferentSigns(dataset[i], dataset[i - 1]))
@@ -418,9 +418,16 @@ namespace UnityChart
                 var text = ticks[i].ToString();
                 var labelLength = Utils.EstimateLabelLengthInPixels(text, this, (int)m_FontSize);
                 var offset = new Vector2(m_WidthOffset - labelLength - m_YLabelMargin, 0);
-                
-                context.DrawText(text, currPos + new Vector2(0, -1.1f * m_FontSize / 2) + offset, m_FontSize,
-                    Color.white);
+
+                if(i < ticks.Count - 1){
+                    context.DrawText(text, currPos + new Vector2(0, -1.1f * m_FontSize / 2) + offset, m_FontSize,
+                        Color.white);
+                }
+                else
+                {
+                    context.DrawText(text, currPos + new Vector2(0, 0.006f * m_FontSize / 2) + offset, m_FontSize,
+                        Color.white);
+                }
                 currPos += painterMovementVector;
             }
         }
@@ -450,7 +457,7 @@ namespace UnityChart
             m_DataProviders.Clear();
             m_DataProviders.Add(new DataProvider(Color.green, "Test"));
             // m_DataProviders[0].Dataset = new List<float>() { 1, 0, 1, 2, -3, 5 };
-            // m_DataProviders.Add(new DataProvider(Color.red, "Test2"));
+            m_DataProviders.Add(new DataProvider(Color.red, "Test2"));
             // m_DataProviders[0].AddDataPoint(0);
             // m_DataProviders[0].AddDataPoint(1);
             // m_DataProviders[0].AddDataPoint(3);
@@ -464,22 +471,28 @@ namespace UnityChart
             //     builder.Append(f + ", ");
             // }
             //
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 210; i++)
             {
-                m_DataProviders[0].AddDataPoint(i % 2);
+                if (i == 0)
+                {
+                    m_DataProviders[0].AddDataPoint(0);
+                    continue;
+                }
+
+                m_DataProviders[0].AddDataPoint(Mathf.Log(i, 2)); 
                 builder.Append(m_DataProviders[0].Dataset[i] + ", ");
             }
 
             builder.Append("]");
 
 
-            // for (int i = 0; i < 3; i++)
-            // {
-            //     m_DataProviders[1].AddDataPoint(Random.value * -5);
-            //     builder.Append(m_DataProviders[1].Dataset[i] + ", ");
-            // }
-            //
-            // builder.Append("]");
+            for (int i = 0; i < 210; i++)
+            {
+                m_DataProviders[1].AddDataPoint(Mathf.Pow(i, 0.5f));
+                builder.Append(m_DataProviders[1].Dataset[i] + ", ");
+            }
+            
+            builder.Append("]");
             Debug.Log(builder.ToString());
 
             MarkDirtyRepaint();
