@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace UnityChart
 {
@@ -8,18 +10,39 @@ namespace UnityChart
     {
         public static int GetNumberOfDigits(int n)
         {
-            
-            return (int)Math.Floor(Math.Log10(n) + 1);;
+            return (int)Math.Floor(Math.Log10(n) + 1);
+            ;
         }
 
-        public static float EstimateLabelLengthInPixels(int length, float fontSize)
+        public static float EstimateLabelLengthInPixels(string text, VisualElement contextElement, int fontSize,
+            FontStyle fontStyle = FontStyle.Normal)
         {
-            return Mathf.Round(4.25f * length);
+            // Use a temporary label to measure
+            var temp = new Label(text)
+            {
+                style =
+                {
+                    unityFont = EditorStyles.standardFont,
+                    fontSize = fontSize,
+                    unityFontStyleAndWeight = fontStyle, 
+                }
+            };
+
+            // UI Toolkit can measure text size with this method:
+            Vector2 size = temp.MeasureTextSize(
+                text,
+                0, // no width restriction
+                VisualElement.MeasureMode.Undefined,
+                0,
+                VisualElement.MeasureMode.Undefined
+            );
+
+            return size.x; // width in local coordinates
         }
 
         public static float GetNiceStep(float range, int maxTicks)
         {
-            if (range <= 0f || maxTicks <= 0) 
+            if (range <= 0f || maxTicks <= 0)
                 return 1f;
 
             var roughStep = range / maxTicks;
@@ -29,7 +52,7 @@ namespace UnityChart
             var normalized = roughStep / magnitude;
 
             var niceNormalized = 0f;
-            
+
             if (normalized < 1.5f)
                 niceNormalized = 1f;
             else if (normalized < 3f)
@@ -56,25 +79,25 @@ namespace UnityChart
         {
             var ans = providers[0].MaxValue;
 
-            for(int i = 1; i < providers.Count; i++)
+            for (int i = 1; i < providers.Count; i++)
             {
                 var providerMax = providers[i].MaxValue;
-                
+
                 if (ans < providerMax)
                     ans = providerMax;
             }
 
             return ans;
         }
-        
+
         public static float FindMinAmongAllDataProviders(List<DataProvider> providers)
         {
             var ans = providers[0].MinValue;
 
-            for(int i = 1; i < providers.Count; i++)
+            for (int i = 1; i < providers.Count; i++)
             {
                 var providerMax = providers[i].MinValue;
-                
+
                 if (ans > providerMax)
                     ans = providerMax;
             }
@@ -84,8 +107,19 @@ namespace UnityChart
 
         public static bool DoValuesHaveDifferentSigns(float n, float m)
         {
-            return n * m <= 0; 
+            return n * m <= 0;
         }
-        
+
+        public static int GetMaxDataProviderLength(List<DataProvider> providers)
+        {
+            int ans = 0;
+            foreach (var p in providers)
+            {
+                if (p.Length > ans)
+                    ans = p.Length;
+            }
+
+            return ans;
+        }
     }
 }
