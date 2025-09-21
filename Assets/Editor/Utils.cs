@@ -121,5 +121,29 @@ namespace UnityChart
 
             return ans;
         }
+        
+        public static bool AreAllElementsNegative(List<DataProvider> providers)
+        {
+            var answer = true;
+
+            foreach (var provider in providers)
+            {
+                answer = answer & provider.Dataset.TrueForAll(item => item < 0);
+            }
+
+            return answer;
+        }
+
+        public static bool AreAllElementsPositive(List<DataProvider> providers)
+        {
+            var answer = true;
+
+            foreach (var provider in providers)
+            {
+                answer = answer & provider.Dataset.TrueForAll(item => item > 0);
+            }
+
+            return answer;
+        }
     }
 }

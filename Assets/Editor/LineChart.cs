@@ -23,7 +23,7 @@ namespace UnityChart
         private float m_WidthOffset;
         private float m_YLabelMargin = 4f;
 
-        private float m_ZeroOnYAxisPosition;
+        // private float m_ZeroOnYAxisPosition;
 
         private float m_ArrowSideLength = 10f;
         private float m_ArrowHeadAngle = 30f;
@@ -32,10 +32,13 @@ namespace UnityChart
         private List<float> m_XTicks;
         private List<float> m_YTicks;
 
+        private Axis m_Axis;
+
         public LineChart()
         {
             generateVisualContent += UpdateWithOldDataset;
             m_DataProviders = new List<DataProvider>();
+            m_Axis = new Axis(layout.height, layout.width);
 
             RepopulateDataset();
         }
@@ -69,96 +72,18 @@ namespace UnityChart
         private void UpdateWithOldDataset(MeshGenerationContext ctx)
         {
             var painter = ctx.painter2D;
+            m_Axis.SetPainter(painter);
+            m_Axis.SetDimensions(layout.height, layout.width);
+            m_Axis.AllDataAreNegative(Utils.AreAllElementsNegative(m_DataProviders));
+            m_Axis.AllDataArePositive(Utils.AreAllElementsPositive(m_DataProviders));
 
             CalculateMinAndMaxValues();
             CalculateAxisScaleAndOffset();
-            DrawChartAxis(painter);
+            m_Axis.SetMinAndMax(m_NiceMinY, m_NiceMaxY);
+            
+            m_Axis.DrawChartAxis();
             DrawTicks(painter, ctx);
             DrawDataGraphs(painter);
-        }
-
-        private void DrawChartAxis(Painter2D painter)
-        {
-            painter.BeginPath();
-            painter.lineWidth = 2f;
-
-            DrawAxisLines(painter);
-            // DrawAxisArrows(painter);
-
-            painter.MoveTo(Vector2.zero);
-
-
-            painter.Stroke();
-            painter.ClosePath();
-        }
-
-        private void DrawAxisLines(Painter2D painter)
-        {
-            painter.strokeColor = Color.white;
-
-            DrawVerticalAxisLine(painter);
-            DrawHorizontalAxisLine(painter);
-
-            painter.Stroke();
-            painter.ClosePath();
-        }
-
-        private void DrawVerticalAxisLine(Painter2D painter)
-        {
-            var originalWidth = painter.lineWidth;
-            painter.lineWidth = 1f;
-
-            painter.MoveTo(new Vector2(m_WidthOffset,
-                0));
-            painter.LineTo(new Vector2(m_WidthOffset,
-                layout.height));
-
-            painter.lineWidth = originalWidth;
-        }
-
-        private void DrawHorizontalAxisLine(Painter2D painter)
-        {
-            var originalWidth = painter.lineWidth;
-            painter.lineWidth = 1f;
-
-            m_ZeroOnYAxisPosition = (m_NiceMaxY / (Mathf.Abs(m_NiceMinY) + m_NiceMaxY)) * layout.height;
-
-            if (AreAllElementsNegative())
-            {
-                m_ZeroOnYAxisPosition = 0f;
-            }
-            else if (AreAllElementsPositive())
-            {
-                m_ZeroOnYAxisPosition = layout.height;
-            }
-
-            painter.MoveTo(new Vector2(m_WidthOffset, m_ZeroOnYAxisPosition));
-            painter.LineTo(new Vector2(layout.width, m_ZeroOnYAxisPosition));
-            painter.lineWidth = originalWidth;
-        }
-
-        private bool AreAllElementsNegative()
-        {
-            var answer = true;
-
-            foreach (var provider in m_DataProviders)
-            {
-                answer = answer & provider.Dataset.TrueForAll(item => item < 0);
-            }
-
-            return answer;
-        }
-
-        private bool AreAllElementsPositive()
-        {
-            var answer = true;
-
-            foreach (var provider in m_DataProviders)
-            {
-                answer = answer & provider.Dataset.TrueForAll(item => item > 0);
-            }
-
-            return answer;
         }
 
         private void DrawAxisArrows(Painter2D painter)
@@ -216,8 +141,8 @@ namespace UnityChart
                 painter.lineWidth = 1.5f;
                 painter.strokeColor = provider.Color;
                 painter.fillColor = new Color(provider.Color.r, provider.Color.g, provider.Color.b, 0.3f);
-                painter.MoveTo(new Vector2(m_WidthOffset, m_ZeroOnYAxisPosition));
-                var currPos = new Vector2(0, m_ZeroOnYAxisPosition);
+                painter.MoveTo(new Vector2(m_WidthOffset, m_Axis.ZeroOnYAxis));
+                var currPos = new Vector2(0, m_Axis.ZeroOnYAxis);
                 var YPos = FindValueOnChartYAxis(provider.Dataset[0],
                     m_NiceMinY,
                     m_NiceMaxY, 0, layout.height);
@@ -257,7 +182,7 @@ namespace UnityChart
                     }
                 }
 
-                painter.LineTo(new Vector2(currPos.x, m_ZeroOnYAxisPosition));
+                painter.LineTo(new Vector2(currPos.x, m_Axis.ZeroOnYAxis));
                 painter.ClosePath();
                 painter.Stroke();
                 painter.Fill();
@@ -270,9 +195,9 @@ namespace UnityChart
         {
             var slope = (point1.y - point2.y) / (point1.x - point2.x);
 
-            var yIntercept = new Vector2(point1.y - (slope * point1.x), m_ZeroOnYAxisPosition);
+            var yIntercept = new Vector2(point1.y - (slope * point1.x), m_Axis.ZeroOnYAxis);
 
-            return new Vector2((m_ZeroOnYAxisPosition - yIntercept.x) / slope, m_ZeroOnYAxisPosition);
+            return new Vector2((m_Axis.ZeroOnYAxis - yIntercept.x) / slope, m_Axis.ZeroOnYAxis);
         }
 
         private void CalculateAxisScaleAndOffset()
