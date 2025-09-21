@@ -23,10 +23,8 @@ namespace UnityChart
         private float m_WidthOffset;
         private float m_YLabelMargin = 4f;
 
-        // private float m_ZeroOnYAxisPosition;
+        private float m_ZeroOnYAxisPosition;
 
-        private float m_ArrowSideLength = 10f;
-        private float m_ArrowHeadAngle = 30f;
         private float m_TickLength = 6f;
         private float m_FontSize = 10f;
         private List<float> m_XTicks;
@@ -85,50 +83,7 @@ namespace UnityChart
             DrawTicks(painter, ctx);
             DrawDataGraphs(painter);
         }
-
-        private void DrawAxisArrows(Painter2D painter)
-        {
-            DrawHorizontalAxisArrow(painter);
-            DrawVerticalAxisArrow(painter);
-        }
-
-        private void DrawHorizontalAxisArrow(Painter2D painter)
-        {
-            var xAxisEnd = new Vector2(layout.width, m_ZeroOnYAxisPosition);
-            painter.MoveTo(xAxisEnd);
-
-            painter.LineTo(new Vector2(
-                Mathf.Cos((180 - (m_ArrowHeadAngle / 2)) * Mathf.Deg2Rad) * m_ArrowSideLength + xAxisEnd.x,
-                Mathf.Sin((180 - (m_ArrowHeadAngle / 2)) * Mathf.Deg2Rad) * m_ArrowSideLength + xAxisEnd.y));
-
-            painter.MoveTo(xAxisEnd);
-            painter.LineTo(new Vector2(
-                Mathf.Cos((180 + (m_ArrowHeadAngle / 2)) * Mathf.Deg2Rad) * m_ArrowSideLength + xAxisEnd.x,
-                Mathf.Sin((180 + (m_ArrowHeadAngle / 2)) * Mathf.Deg2Rad) * m_ArrowSideLength + xAxisEnd.y));
-
-            painter.Stroke();
-            painter.ClosePath();
-        }
-
-        private void DrawVerticalAxisArrow(Painter2D painter)
-        {
-            var yAxisEnd = new Vector2(-Mathf.Sin(270 - ((m_ArrowHeadAngle / 2) * Mathf.Deg2Rad)) * m_ArrowSideLength,
-                0);
-            painter.MoveTo(yAxisEnd);
-
-            painter.LineTo(new Vector2(
-                -Mathf.Cos((270 - (m_ArrowHeadAngle / 2)) * Mathf.Deg2Rad) * m_ArrowSideLength + yAxisEnd.x,
-                -Mathf.Sin((270 - (m_ArrowHeadAngle / 2)) * Mathf.Deg2Rad) * m_ArrowSideLength + yAxisEnd.y));
-
-            painter.MoveTo(yAxisEnd);
-            painter.LineTo(new Vector2(
-                -Mathf.Cos((270 + (m_ArrowHeadAngle / 2)) * Mathf.Deg2Rad) * m_ArrowSideLength + yAxisEnd.x,
-                -Mathf.Sin((270 + (m_ArrowHeadAngle / 2)) * Mathf.Deg2Rad) * m_ArrowSideLength + yAxisEnd.y));
-
-            painter.Stroke();
-            painter.ClosePath();
-        }
-
+        
         private void DrawDataGraphs(Painter2D painter)
         {
             foreach (var provider in m_DataProviders)
