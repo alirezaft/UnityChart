@@ -9,15 +9,15 @@ namespace UnityChart
         private float m_TickLength;
         private float m_Height;
         private float m_Width;
-        private int m_Length;
+        private int m_DataLength;
 
         private Axis m_Axis;
         private Painter2D m_Painter;
 
-        public Ticks(Axis axis, int length, float tickLength)
+        public Ticks(Axis axis, int dataLength, float tickLength)
         {
             m_Axis = axis;
-            m_Length = length;
+            m_DataLength = dataLength;
             m_TickLength = tickLength;
         }
         
@@ -47,8 +47,8 @@ namespace UnityChart
         {
             var numberOfTicks = ticksList.Count - 1;
 
-            var dataSteps = m_Width / (m_Length - 1);
-            var dataToTickRatio = ((float)m_Length - 1) / (ticksList.Count - 1);
+            var dataSteps = m_Width / (m_DataLength - 1);
+            var dataToTickRatio = ((float)m_DataLength - 1) / (ticksList.Count - 1);
 
 
             Debug.Log("Num of Ticks: " + numberOfTicks);

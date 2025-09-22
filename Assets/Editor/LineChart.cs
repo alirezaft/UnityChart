@@ -31,6 +31,7 @@ namespace UnityChart
 
         private Axis m_Axis;
         private Ticks m_Ticks;
+        private TickLabel m_Labels;
 
         public LineChart()
         {
@@ -39,6 +40,7 @@ namespace UnityChart
             generateVisualContent += UpdateWithOldDataset;
             m_Axis = new Axis(layout.height, layout.width);
             m_Ticks = new Ticks(m_Axis, m_DataProviders[0].Length, 3f);
+            m_Labels = new TickLabel(m_FontSize, m_Axis);
         }
 
         private void CalculateMinAndMaxValues()
@@ -75,6 +77,8 @@ namespace UnityChart
             DrawAxes(ctx.painter2D);
 
             DrawTicks(painter, ctx);
+            DrawLabels(ctx);
+            
             DrawDataGraphs(painter);
         }
 
@@ -87,6 +91,15 @@ namespace UnityChart
 
             m_Axis.SetMinAndMax(m_NiceMinY, m_NiceMaxY);
             m_Axis.DrawChartAxis();
+        }
+
+        private void DrawLabels(MeshGenerationContext ctx)
+        {
+            m_Labels.SetDimensions(layout.height, layout.width);
+            m_Labels.SetMeshGenerationContext(ctx);
+            m_Labels.SetDataLength(m_DataProviders[0].Length);
+            
+            m_Labels.PlaceYAxisTickLabels(m_YTicks);
         }
         
         private void DrawDataGraphs(Painter2D painter)
@@ -196,57 +209,6 @@ namespace UnityChart
             }
 
             return ans;
-        }
-
-        
-        private void PlaceXAxisTickLabels(List<float> ticks, MeshGenerationContext context)
-        {
-            var numberOfLabels = ticks.Count;
-            var dataSteps = layout.width / (m_DataProviders[0].Length - 1);
-            var dataToTickRatio = ((float)m_DataProviders[0].Length - 1) / (ticks.Count - 1);
-            var labelPositionStep = dataSteps * dataToTickRatio;
-
-            for (int i = 0; i < ticks.Count; i++)
-            {
-                var labelContent = (int)ticks[i];
-                var labelPosition =
-                    new Vector2(i * labelPositionStep,
-                        m_ZeroOnYAxisPosition);
-                var labelAdjustmentVector = new Vector2(-(((int)Mathf.Log10(labelContent) + 1) * m_FontSize) / 2, 4);
-
-                labelPosition += i == ticks.Count - 1
-                    ? new Vector2(labelAdjustmentVector.x * 2, labelAdjustmentVector.y)
-                    : labelAdjustmentVector;
-
-                context.DrawText(labelContent.ToString(), labelPosition, m_FontSize, Color.white);
-            }
-        }
-
-        
-
-        private void PlaceYAxisTickLabels(List<float> ticks, MeshGenerationContext context)
-        {
-            var labelDistance = layout.height / (ticks.Count - 1);
-            var painterMovementVector = new Vector2(0, -labelDistance);
-            var currPos = new Vector2(0, layout.height);
-
-            for (int i = 0; i < ticks.Count; i++)
-            {
-                var text = ticks[i].ToString();
-                var labelLength = Utils.EstimateLabelLengthInPixels(text, this, (int)m_FontSize);
-                var offset = new Vector2(m_WidthOffset - labelLength - m_YLabelMargin, 0);
-
-                if(i < ticks.Count - 1){
-                    context.DrawText(text, currPos + new Vector2(0, -1.1f * m_FontSize / 2) + offset, m_FontSize,
-                        Color.white);
-                }
-                else
-                {
-                    context.DrawText(text, currPos + new Vector2(0, 0.006f * m_FontSize / 2) + offset, m_FontSize,
-                        Color.white);
-                }
-                currPos += painterMovementVector;
-            }
         }
 
         private float FindValueOnChartYAxis(float value, float sourceMin, float sourceMax, float destinationMin,
