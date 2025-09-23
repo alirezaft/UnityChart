@@ -15,12 +15,14 @@ namespace UnityChart
         private List<float> m_Numbers;
         private Painter2D m_Painter;
         private Axis m_Axis;
+        private ChartLayout m_ChartLayout;
         private MeshGenerationContext m_MeshGenerationContext;
 
-        public TickLabel(float fontSize, Axis axis)
+        public TickLabel(float fontSize, Axis axis, ChartLayout layout)
         {
             m_FontSize = fontSize;
             m_Axis = axis;
+            m_ChartLayout = layout;
         }
         
         public void PlaceYAxisTickLabels(List<float> ticks)
@@ -33,7 +35,7 @@ namespace UnityChart
             {
                 var text = ticks[i].ToString();
                 var labelLength = Utils.EstimateLabelLengthInPixels(text, m_MeshGenerationContext.visualElement, (int)m_FontSize);
-                var offset = new Vector2(/*m_WidthOffset*/ - labelLength - m_LabelMargin, 0);
+                var offset = new Vector2(m_ChartLayout.WidthOffset - labelLength - m_ChartLayout.LabelMargin, 0);
 
                 if(i < ticks.Count - 1){
                     m_MeshGenerationContext.DrawText(text, currPos + new Vector2(0, -1.1f * m_FontSize / 2) + offset, m_FontSize,

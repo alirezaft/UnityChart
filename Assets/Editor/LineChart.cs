@@ -20,7 +20,7 @@ namespace UnityChart
         private float m_MaxX;
         private float m_NiceMaxY;
         private float m_NiceMinY;
-        private float m_WidthOffset;
+        // private float m_WidthOffset;
         private float m_YLabelMargin = 4f;
 
         private float m_ZeroOnYAxisPosition;
@@ -32,15 +32,18 @@ namespace UnityChart
         private Axis m_Axis;
         private Ticks m_Ticks;
         private TickLabel m_Labels;
+        private ChartLayout m_ChartLayout;
 
         public LineChart()
         {
             m_DataProviders = new List<DataProvider>();
             RepopulateDataset();
             generateVisualContent += UpdateWithOldDataset;
-            m_Axis = new Axis(layout.height, layout.width);
-            m_Ticks = new Ticks(m_Axis, m_DataProviders[0].Length, 3f);
-            m_Labels = new TickLabel(m_FontSize, m_Axis);
+
+            m_ChartLayout = new ChartLayout(m_YLabelMargin, m_FontSize, this);
+            m_Axis = new Axis(layout.height, layout.width, m_ChartLayout);
+            m_Ticks = new Ticks(m_Axis, m_DataProviders[0].Length, 3f, m_ChartLayout);
+            m_Labels = new TickLabel(m_FontSize, m_Axis, m_ChartLayout);
         }
 
         private void CalculateMinAndMaxValues()
@@ -106,23 +109,24 @@ namespace UnityChart
         {
             foreach (var provider in m_DataProviders)
             {
-                var latestPointOnXAxis = m_WidthOffset;
-                var xSteps = (layout.width - m_WidthOffset) / (provider.Length - 1);
+                var offset = m_ChartLayout.CaclulateWidthOffset(m_YTicks);
+                var latestPointOnXAxis = offset;
+                var xSteps = (layout.width - offset) / (provider.Length - 1);
                 Debug.Log($"data steps x2 {xSteps}");
 
                 painter.BeginPath();
                 painter.lineWidth = 1.5f;
                 painter.strokeColor = provider.Color;
                 painter.fillColor = new Color(provider.Color.r, provider.Color.g, provider.Color.b, 0.3f);
-                painter.MoveTo(new Vector2(m_WidthOffset, m_Axis.ZeroOnYAxis));
+                painter.MoveTo(new Vector2(offset, m_Axis.ZeroOnYAxis));
                 var currPos = new Vector2(0, m_Axis.ZeroOnYAxis);
                 var YPos = FindValueOnChartYAxis(provider.Dataset[0],
                     m_NiceMinY,
                     m_NiceMaxY, 0, layout.height);
 
 
-                painter.LineTo(new Vector2(m_WidthOffset, YPos));
-                currPos = new Vector2(m_WidthOffset, YPos);
+                painter.LineTo(new Vector2(offset, YPos));
+                currPos = new Vector2(offset, YPos);
                 var dataset = provider.Dataset;
 
                 for (int i = 1; i < dataset.Count; i++)
@@ -186,8 +190,9 @@ namespace UnityChart
 
             m_XTicks = niceScaleX.GetTicks();
             m_YTicks = niceScaleY.GetTicks();
+            m_ChartLayout.CaclulateWidthOffset(m_YTicks);
 
-            m_WidthOffset = FindLongestLabelLength(m_YTicks) + m_YLabelMargin;
+            // m_WidthOffset = FindLongestLabelLength(m_YTicks) + m_YLabelMargin;
         }
 
         private void DrawTicks(Painter2D painter, MeshGenerationContext context)
@@ -195,20 +200,6 @@ namespace UnityChart
             m_Ticks.SetDimensions(layout.height, layout.width);
             m_Ticks.SetPainter(painter);
             m_Ticks.PlaceTicksOnYAxis(m_YTicks.Count);
-        }
-
-        private float FindLongestLabelLength(List<float> yTicks)
-        {
-            float ans = 0;
-
-            foreach (var tick in yTicks)
-            {
-                var currLength = Utils.EstimateLabelLengthInPixels(tick.ToString(), this, (int)m_FontSize);
-                if (ans < currLength)
-                    ans = currLength;
-            }
-
-            return ans;
         }
 
         private float FindValueOnChartYAxis(float value, float sourceMin, float sourceMax, float destinationMin,

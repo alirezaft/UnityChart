@@ -20,11 +20,13 @@ namespace UnityChart
         
         private Painter2D m_Painter;
         private NiceScale m_Scale;
+        private ChartLayout m_ChartLayout;
         
-        public Axis(float chartHeight, float chartWidth)
+        public Axis(float chartHeight, float chartWidth, ChartLayout layout)
         {
             m_Height = chartHeight;
             m_Width = chartWidth;
+            m_ChartLayout = layout;
         }
 
         public void DrawChartAxis()
@@ -45,7 +47,8 @@ namespace UnityChart
         private void DrawAxisLines()
         {
             m_Painter.strokeColor = Color.white;
-
+            // m_WidthOffset = m_ChartLayout.CaclulateWidthOffset()
+    
             DrawVerticalAxisLine();
             DrawHorizontalAxisLine();
 
@@ -58,9 +61,11 @@ namespace UnityChart
             var originalWidth = m_Painter.lineWidth;
             m_Painter.lineWidth = 1f;
 
-            m_Painter.MoveTo(new Vector2(m_WidthOffset,
+            var offset = m_ChartLayout.WidthOffset;
+            
+            m_Painter.MoveTo(new Vector2(offset,
                 0));
-            m_Painter.LineTo(new Vector2(m_WidthOffset,
+            m_Painter.LineTo(new Vector2(offset,
                 m_Height));
 
             m_Painter.lineWidth = originalWidth;
@@ -81,7 +86,7 @@ namespace UnityChart
 
             m_ZeroOnYAxisPosition = (m_NiceMaxY / (Mathf.Abs(m_NiceMinY) + m_NiceMaxY)) * m_Height;
 
-            m_Painter.MoveTo(new Vector2(m_WidthOffset, m_ZeroOnYAxisPosition));
+            m_Painter.MoveTo(new Vector2(m_ChartLayout.WidthOffset, m_ZeroOnYAxisPosition));
             m_Painter.LineTo(new Vector2(m_Width, m_ZeroOnYAxisPosition));
             m_Painter.lineWidth = originalWidth;
         }

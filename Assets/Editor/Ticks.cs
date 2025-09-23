@@ -13,12 +13,14 @@ namespace UnityChart
 
         private Axis m_Axis;
         private Painter2D m_Painter;
+        private ChartLayout m_ChartLayout;
 
-        public Ticks(Axis axis, int dataLength, float tickLength)
+        public Ticks(Axis axis, int dataLength, float tickLength, ChartLayout layout)
         {
             m_Axis = axis;
             m_DataLength = dataLength;
             m_TickLength = tickLength;
+            m_ChartLayout = layout;
         }
         
         public void PlaceTicksOnYAxis(int ticksCount)
@@ -27,7 +29,7 @@ namespace UnityChart
             var tickVector = new Vector2(m_TickLength, 0);
             var painterStepVector = new Vector2(-m_TickLength, -tickDistance);
 
-            var currPos = new Vector2(0 + m_TickLength, m_Height);
+            var currPos = new Vector2(m_ChartLayout.WidthOffset + m_TickLength, m_Height);
             m_Painter.MoveTo(currPos);
 
             for (int i = 0; i < ticksCount; i++)
