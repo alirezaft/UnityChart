@@ -20,10 +20,7 @@ namespace UnityChart
         private float m_MaxX;
         private float m_NiceMaxY;
         private float m_NiceMinY;
-        // private float m_WidthOffset;
         private float m_YLabelMargin = 4f;
-
-        private float m_ZeroOnYAxisPosition;
 
         private float m_FontSize = 10f;
         private List<float> m_XTicks;
@@ -191,8 +188,6 @@ namespace UnityChart
             m_XTicks = niceScaleX.GetTicks();
             m_YTicks = niceScaleY.GetTicks();
             m_ChartLayout.CaclulateWidthOffset(m_YTicks);
-
-            // m_WidthOffset = FindLongestLabelLength(m_YTicks) + m_YLabelMargin;
         }
 
         private void DrawTicks(Painter2D painter, MeshGenerationContext context)
@@ -205,21 +200,14 @@ namespace UnityChart
         private float FindValueOnChartYAxis(float value, float sourceMin, float sourceMax, float destinationMin,
             float destinationMax)
         {
-            // if (AreAllElementsNegative())
-            // {
-            //     (sourceMax, sourceMin) = (sourceMin, sourceMax);
-            // }
-
             var t = value - sourceMin;
             t = t / (sourceMax - sourceMin) * (destinationMax - destinationMin);
 
             var yMidpoint = (destinationMax + destinationMin) / 2;
-            // yMidpoint = t > yMidpoint ? -yMidpoint : yMidpoint;
             t = t < yMidpoint ? (2 * (yMidpoint - t)) + t : t - (2 * (t - yMidpoint));
 
 
             return Mathf.Abs(t);
-            // return destinationMax - t * (+destinationMax - destinationMin);
         }
 
         public void RepopulateDataset()
