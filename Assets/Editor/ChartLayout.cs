@@ -8,6 +8,12 @@ namespace UnityChart
     {
         private float m_Height;
         private float m_Width;
+
+        private float m_ChartHeightPercent = 0.8f;
+        private float m_LegendHeightPercent = 0.2f;
+
+        public float ChartHeight => m_Height * m_ChartHeightPercent;
+        public float LegendHeight => m_Height * m_LegendHeightPercent;
         
         private float m_WidthOffset;
         public float WidthOffset => m_WidthOffset;

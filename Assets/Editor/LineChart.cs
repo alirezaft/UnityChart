@@ -1,9 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using Unity.VisualScripting;
-using UnityEditor.VersionControl;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -30,6 +26,7 @@ namespace UnityChart
         private Ticks m_Ticks;
         private TickLabel m_Labels;
         private ChartLayout m_ChartLayout;
+        private ChartLegend m_Legend;
 
         public LineChart()
         {
@@ -41,6 +38,7 @@ namespace UnityChart
             m_Axis = new Axis(layout.height, layout.width, m_ChartLayout);
             m_Ticks = new Ticks(m_Axis, m_DataProviders[0].Length, 3f, m_ChartLayout);
             m_Labels = new TickLabel(m_FontSize, m_Axis, m_ChartLayout);
+            m_Legend = new ChartLegend(m_ChartLayout, this);
         }
 
         private void CalculateMinAndMaxValues()
@@ -80,6 +78,22 @@ namespace UnityChart
             DrawLabels(ctx);
             
             DrawDataGraphs(painter);
+            DrawChartLegend(painter, ctx);
+        }
+
+        private void DrawChartLegend(Painter2D painter, MeshGenerationContext ctx)
+        {
+            m_Legend.ClearLegends();
+            foreach (var provider in m_DataProviders)
+            {
+                m_Legend.AddLegend(provider.GetLegend());
+            }
+            
+            m_Legend.SetContext(ctx);
+            m_Legend.SetPainter(painter);
+            m_Legend.SetDimension(layout.height, layout.width);
+            
+            m_Legend.DrawLegends();
         }
 
         private void DrawAxes(Painter2D painter)
