@@ -35,7 +35,7 @@ namespace UnityChart
             generateVisualContent += UpdateWithOldDataset;
 
             m_ChartLayout = new ChartLayout(m_YLabelMargin, m_FontSize, this);
-            m_Axis = new Axis(layout.height, layout.width, m_ChartLayout);
+            m_Axis = new Axis(m_ChartLayout.ChartHeight, layout.width, m_ChartLayout);
             m_Ticks = new Ticks(m_Axis, m_DataProviders[0].Length, 3f, m_ChartLayout);
             m_Labels = new TickLabel(m_FontSize, m_Axis, m_ChartLayout);
             m_Legend = new ChartLegend(m_ChartLayout, this);
@@ -69,6 +69,7 @@ namespace UnityChart
 
         private void UpdateWithOldDataset(MeshGenerationContext ctx)
         {
+            m_ChartLayout.SetVisualElementDimension(layout.height, layout.width);
             var painter = ctx.painter2D;
             CalculateMinAndMaxValues();
             CalculateAxisScaleAndOffset();
@@ -99,7 +100,7 @@ namespace UnityChart
         private void DrawAxes(Painter2D painter)
         {
             m_Axis.SetPainter(painter);
-            m_Axis.SetDimensions(layout.height, layout.width);
+            m_Axis.SetDimensions(m_ChartLayout.ChartHeight, layout.width);
             m_Axis.AllDataAreNegative(Utils.AreAllElementsNegative(m_DataProviders));
             m_Axis.AllDataArePositive(Utils.AreAllElementsPositive(m_DataProviders));
 
@@ -109,7 +110,7 @@ namespace UnityChart
 
         private void DrawLabels(MeshGenerationContext ctx)
         {
-            m_Labels.SetDimensions(layout.height, layout.width);
+            m_Labels.SetDimensions(m_ChartLayout.ChartHeight, layout.width);
             m_Labels.SetMeshGenerationContext(ctx);
             m_Labels.SetDataLength(m_DataProviders[0].Length);
             
@@ -133,7 +134,7 @@ namespace UnityChart
                 var currPos = new Vector2(0, m_Axis.ZeroOnYAxis);
                 var YPos = FindValueOnChartYAxis(provider.Dataset[0],
                     m_NiceMinY,
-                    m_NiceMaxY, 0, layout.height);
+                    m_NiceMaxY, 0, m_ChartLayout.ChartHeight);
 
 
                 painter.LineTo(new Vector2(offset, YPos));
@@ -144,7 +145,7 @@ namespace UnityChart
                 {
                     var dataPointY = FindValueOnChartYAxis(dataset[i], m_NiceMinY,
                         m_NiceMaxY,
-                        0, layout.height);
+                        0, m_ChartLayout.ChartHeight);
 
                     if (Utils.DoValuesHaveDifferentSigns(dataset[i], dataset[i - 1]))
                     {
@@ -206,7 +207,7 @@ namespace UnityChart
 
         private void DrawTicks(Painter2D painter, MeshGenerationContext context)
         {
-            m_Ticks.SetDimensions(layout.height, layout.width);
+            m_Ticks.SetDimensions(m_ChartLayout.ChartHeight, layout.width);
             m_Ticks.SetPainter(painter);
             m_Ticks.PlaceTicksOnYAxis(m_YTicks.Count);
         }

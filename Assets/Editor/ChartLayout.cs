@@ -51,5 +51,11 @@ namespace UnityChart
 
             return ans;
         }
+
+        public void SetVisualElementDimension(float height, float width)
+        {
+            m_Height = height;
+            m_Width = width;
+        }
     }
 }

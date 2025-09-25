@@ -31,7 +31,7 @@ namespace UnityChart
             var widthMiddle = m_Width / 2;
             var legendLength = EstimateLegendLength();
 
-            var currPos = new Vector2(widthMiddle - (legendLength / 2), m_Height - (m_Height * m_Layout.LegendHeight));
+            var currPos = new Vector2(widthMiddle - (legendLength / 2), m_Height - (m_Layout.LegendHeight * 0.5f));
             var textPositionVector =
                 new Vector2(m_LegendLayout.ColorIndicatorRadius + m_LegendLayout.TextAndColorSpacing, -m_LegendLayout.Fontsize / 1.5f);
 
