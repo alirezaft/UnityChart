@@ -69,17 +69,28 @@ namespace UnityChart
 
         private void UpdateWithOldDataset(MeshGenerationContext ctx)
         {
-            m_ChartLayout.SetVisualElementDimension(layout.height, layout.width);
+            InitLayout();
             var painter = ctx.painter2D;
+            
             CalculateMinAndMaxValues();
             CalculateAxisScaleAndOffset();
             DrawAxes(ctx.painter2D);
 
             DrawTicks(painter, ctx);
             DrawLabels(ctx);
-            
+
             DrawDataGraphs(painter);
             DrawChartLegend(painter, ctx);
+        }
+
+        private void InitLayout()
+        {
+            m_ChartLayout.SetVisualElementDimension(layout.height, layout.width);
+            
+            var style = this.style;
+            m_ChartLayout.SetPadding(Utils.LengthToFloat(style.paddingTop), Utils.LengthToFloat(style.paddingBottom),
+                Utils.LengthToFloat(style.paddingLeft),
+                Utils.LengthToFloat(style.paddingRight));
         }
 
         private void DrawChartLegend(Painter2D painter, MeshGenerationContext ctx)
@@ -89,11 +100,11 @@ namespace UnityChart
             {
                 m_Legend.AddLegend(provider.GetLegend());
             }
-            
+
             m_Legend.SetContext(ctx);
             m_Legend.SetPainter(painter);
             m_Legend.SetDimension(layout.height, layout.width);
-            
+
             m_Legend.DrawLegends();
         }
 
@@ -113,10 +124,10 @@ namespace UnityChart
             m_Labels.SetDimensions(m_ChartLayout.ChartHeight, layout.width);
             m_Labels.SetMeshGenerationContext(ctx);
             m_Labels.SetDataLength(m_DataProviders[0].Length);
-            
+
             m_Labels.PlaceYAxisTickLabels(m_YTicks);
         }
-        
+
         private void DrawDataGraphs(Painter2D painter)
         {
             foreach (var provider in m_DataProviders)
@@ -246,7 +257,7 @@ namespace UnityChart
             //
             for (int i = 0; i < 20; i++)
             {
-                m_DataProviders[0].AddDataPoint(Random.value * 10); 
+                m_DataProviders[0].AddDataPoint(Random.value * 10);
                 builder.Append(m_DataProviders[0].Dataset[i] + ", ");
             }
 
@@ -263,8 +274,7 @@ namespace UnityChart
                 -0.4716486f, -1.000425f, 0.9232992f, -3.673697f, 0.6259388f, 1.672141f, -2.982634f, 1.078195f,
                 -2.848732f, -0.5303007f, -3.71349f, -2.054001f
             };
-            
-            
+
 
             builder.Append("]");
 
@@ -274,7 +284,7 @@ namespace UnityChart
             //     m_DataProviders[1].AddDataPoint((Random.value * 10) - 5);
             //     builder.Append(m_DataProviders[1].Dataset[i] + ", ");
             // }
-            
+
             builder.Append("]");
             Debug.Log(builder.ToString());
 

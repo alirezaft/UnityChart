@@ -145,5 +145,10 @@ namespace UnityChart
 
             return answer;
         }
+
+        public static float LengthToFloat(StyleLength length)
+        {
+            return length.value.value;
+        }
     }
 }

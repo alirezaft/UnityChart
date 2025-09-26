@@ -17,11 +17,11 @@ namespace UnityChart
 
         private bool m_AreAllNegative;
         private bool m_AreAllPositive;
-        
+
         private Painter2D m_Painter;
         private NiceScale m_Scale;
         private ChartLayout m_ChartLayout;
-        
+
         public Axis(float chartHeight, float chartWidth, ChartLayout layout)
         {
             m_Height = chartHeight;
@@ -48,7 +48,7 @@ namespace UnityChart
         {
             m_Painter.strokeColor = Color.white;
             // m_WidthOffset = m_ChartLayout.CaclulateWidthOffset()
-    
+
             DrawVerticalAxisLine();
             DrawHorizontalAxisLine();
 
@@ -61,12 +61,12 @@ namespace UnityChart
             var originalWidth = m_Painter.lineWidth;
             m_Painter.lineWidth = 1f;
 
-            var offset = m_ChartLayout.WidthOffset;
-            
+            var offset = m_ChartLayout.WidthOffset + m_ChartLayout.XStart;
+
             m_Painter.MoveTo(new Vector2(offset,
-                0));
+                m_ChartLayout.YStart));
             m_Painter.LineTo(new Vector2(offset,
-                m_Height));
+                m_ChartLayout.ChartHeight));
 
             m_Painter.lineWidth = originalWidth;
         }
@@ -75,19 +75,21 @@ namespace UnityChart
         {
             if (m_AreAllNegative)
             {
-                m_ZeroOnYAxisPosition = 0f;
-            }else if (m_AreAllPositive)
+                m_ZeroOnYAxisPosition = m_ChartLayout.YStart;
+            }
+            else if (m_AreAllPositive)
             {
-                m_ZeroOnYAxisPosition = m_Height;
+                m_ZeroOnYAxisPosition = m_ChartLayout.YEnd;
             }
 
             float originalWidth = m_Painter.lineWidth;
             m_Painter.lineWidth = 1f;
 
-            m_ZeroOnYAxisPosition = (m_NiceMaxY / (Mathf.Abs(m_NiceMinY) + m_NiceMaxY)) * m_Height;
+            m_ZeroOnYAxisPosition = (m_NiceMaxY / (Mathf.Abs(m_NiceMinY) + m_NiceMaxY)) *
+                                    (m_ChartLayout.AllowedHeight);
 
-            m_Painter.MoveTo(new Vector2(m_ChartLayout.WidthOffset, m_ZeroOnYAxisPosition));
-            m_Painter.LineTo(new Vector2(m_Width, m_ZeroOnYAxisPosition));
+            m_Painter.MoveTo(new Vector2(m_ChartLayout.WidthOffset + m_ChartLayout.XStart, m_ZeroOnYAxisPosition));
+            m_Painter.LineTo(new Vector2(m_ChartLayout.XEnd, m_ZeroOnYAxisPosition));
             m_Painter.lineWidth = originalWidth;
         }
 
