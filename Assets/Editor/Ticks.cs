@@ -22,24 +22,27 @@ namespace UnityChart
             m_TickLength = tickLength;
             m_ChartLayout = layout;
         }
-        
+
         public void PlaceTicksOnYAxis(int ticksCount)
         {
-            var tickDistance = m_Height / (ticksCount - 1);
+            var tickDistance = m_ChartLayout.ChartHeight / (ticksCount - 1);
+            Debug.Log($"tickDistance: {tickDistance}, tickCount: {ticksCount}");
             var tickVector = new Vector2(m_TickLength, 0);
-            var painterStepVector = new Vector2(-m_TickLength, -tickDistance);
+            var painterStepVector = new Vector2(0, tickDistance);
 
-            var currPos = new Vector2(m_ChartLayout.WidthOffset + m_TickLength, m_Height);
-            m_Painter.MoveTo(currPos);
-
-            for (int i = 0; i < ticksCount; i++)
+            m_Painter.strokeColor = Color.white;
+            var tickX = m_ChartLayout.WidthOffset + m_ChartLayout.XStart;
+            
+            // var currPos = startPoint;
+             
+            for (float i = m_ChartLayout.YStart; i <= m_ChartLayout.ChartHeight + m_ChartLayout.YStart; i += tickDistance)
             {
                 m_Painter.BeginPath();
-                m_Painter.strokeColor = Color.white;
-                m_Painter.MoveTo(currPos + painterStepVector);
-                currPos += painterStepVector;
-                m_Painter.LineTo(currPos + tickVector * 1.5f);
-                currPos += tickVector;
+
+                var currPos = new Vector2(tickX, i);
+                m_Painter.MoveTo(currPos);
+                m_Painter.LineTo(currPos + tickVector);
+                
                 m_Painter.Stroke();
                 m_Painter.ClosePath();
             }
@@ -49,7 +52,7 @@ namespace UnityChart
         {
             var numberOfTicks = ticksList.Count - 1;
 
-            var dataSteps = m_Width / (m_DataLength - 1);
+            var dataSteps = m_ChartLayout.AllowedWidth / (m_DataLength - 1);
             var dataToTickRatio = ((float)m_DataLength - 1) / (ticksList.Count - 1);
 
 
@@ -87,6 +90,5 @@ namespace UnityChart
             m_Height = height;
             m_Width = width;
         }
-
     }
 }

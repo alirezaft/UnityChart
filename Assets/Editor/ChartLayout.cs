@@ -9,6 +9,11 @@ namespace UnityChart
         private float m_Height;
         private float m_Width;
 
+        public float PaddingBottom => m_PaddingBottom;
+        public float PaddingUpper => m_PaddingUpper;
+        public float PaddingLeft => m_PaddingLeft;
+        public float PaddingRight => m_PaddingRight;
+        
         private float m_PaddingBottom = 0;
         private float m_PaddingUpper = 0;
         private float m_PaddingLeft = 0;
@@ -17,8 +22,8 @@ namespace UnityChart
         private float m_ChartHeightPercent = 0.8f;
         private float m_LegendHeightPercent = 0.2f;
 
-        public float ChartHeight => m_Height * m_ChartHeightPercent;
-        public float LegendHeight => m_Height * m_LegendHeightPercent;
+
+        
         
         public float YStart => m_PaddingUpper;
         public float YEnd => m_Height - m_PaddingBottom;
@@ -27,8 +32,10 @@ namespace UnityChart
 
         public float AllowedHeight => YEnd - YStart;
         public float AllowedWidth => XEnd - XStart;
-        
-        
+
+
+        public float ChartHeight => AllowedHeight * m_ChartHeightPercent;
+        public float LegendHeight => AllowedHeight * m_LegendHeightPercent;
         
         private float m_WidthOffset;
         public float WidthOffset => m_WidthOffset;

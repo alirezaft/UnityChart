@@ -27,9 +27,9 @@ namespace UnityChart
         
         public void PlaceYAxisTickLabels(List<float> ticks)
         {
-            var labelDistance = m_Height / (ticks.Count - 1);
+            var labelDistance = m_ChartLayout.ChartHeight / (ticks.Count - 1);
             var painterMovementVector = new Vector2(0, -labelDistance);
-            var currPos = new Vector2(0, m_Height);
+            var currPos = new Vector2(m_ChartLayout.XStart, m_ChartLayout.YStart + m_ChartLayout.ChartHeight);
 
             for (int i = 0; i < ticks.Count; i++)
             {
