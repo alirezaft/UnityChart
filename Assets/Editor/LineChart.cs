@@ -55,6 +55,7 @@ namespace UnityChart
         private void ResetMouseIndicator(MouseLeaveEvent evt)
         {
             m_PositionIndicator.Reset();
+            MarkDirtyRepaint();
         }
 
         private void UpdateMouseIndicatorPosition(MouseMoveEvent evt)
