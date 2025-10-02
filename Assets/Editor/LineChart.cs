@@ -27,19 +27,40 @@ namespace UnityChart
         private TickLabel m_Labels;
         private ChartLayout m_ChartLayout;
         private ChartLegend m_Legend;
+        private MousePositionIndicator m_PositionIndicator;
 
         public LineChart()
         {
             m_DataProviders = new List<DataProvider>();
-            RepopulateDataset();
             generateVisualContent += UpdateWithOldDataset;
-            
+
 
             m_ChartLayout = new ChartLayout(m_YLabelMargin, m_FontSize, this);
+            m_PositionIndicator = new MousePositionIndicator(m_ChartLayout);
+            RepopulateDataset();
             m_Axis = new Axis(m_ChartLayout.ChartHeight, layout.width, m_ChartLayout);
             m_Ticks = new Ticks(m_Axis, m_DataProviders[0].Length, 4f, m_ChartLayout);
             m_Labels = new TickLabel(m_FontSize, m_Axis, m_ChartLayout);
             m_Legend = new ChartLegend(m_ChartLayout, this);
+
+            RegisterChartEvents();
+        }
+
+        private void RegisterChartEvents()
+        {
+            RegisterCallback<MouseMoveEvent>(UpdateMouseIndicatorPosition);
+            RegisterCallback<MouseLeaveEvent>(ResetMouseIndicator);
+        }
+
+        private void ResetMouseIndicator(MouseLeaveEvent evt)
+        {
+            m_PositionIndicator.Reset();
+        }
+
+        private void UpdateMouseIndicatorPosition(MouseMoveEvent evt)
+        {
+            m_PositionIndicator.UpdateMousePosition(evt.mousePosition);
+            MarkDirtyRepaint();
         }
 
         protected override Vector2 DoMeasure(float desiredWidth, MeasureMode widthMode, float desiredHeight, MeasureMode heightMode)
@@ -92,6 +113,8 @@ namespace UnityChart
 
             DrawDataGraphs(painter);
             DrawChartLegend(painter, ctx);
+            
+            m_PositionIndicator.Draw(painter);
         }
 
         private void InitLayout()
@@ -99,12 +122,13 @@ namespace UnityChart
             this.style.minWidth = new StyleLength(m_ChartLayout.MinWidth);
             this.style.minHeight = new StyleLength(m_ChartLayout.MinHeight);
             m_ChartLayout.SetVisualElementDimension(layout.height, layout.width);
-            
+
             var style = this.style;
             Debug.Log($"paddingTop: {resolvedStyle.paddingTop}");
             m_ChartLayout.SetPadding(Utils.LengthToFloat(resolvedStyle.paddingTop), Utils.LengthToFloat(resolvedStyle.paddingBottom),
                 Utils.LengthToFloat(resolvedStyle.paddingLeft),
                 Utils.LengthToFloat(resolvedStyle.paddingRight));
+            m_ChartLayout.SetXStepLength(Utils.GetMaxDataProviderLength(m_DataProviders));
         }
 
         private void DrawChartLegend(Painter2D painter, MeshGenerationContext ctx)
@@ -163,6 +187,8 @@ namespace UnityChart
 
 
                 var currPos = new Vector2(offset + m_ChartLayout.XStart, YPos);
+                Debug.Log($"points length: {provider.DataPointPositions.Count}");
+                provider.DataPointPositions[0] = currPos;
                 painter.LineTo(currPos);
                 var dataset = provider.Dataset;
 
@@ -189,12 +215,14 @@ namespace UnityChart
                         painter.LineTo(new Vector2(currPos.x + xSteps, dataPointY));
 
                         currPos = new Vector2(currPos.x + xSteps, dataPointY);
+                        provider.DataPointPositions[i] = currPos;
                         latestPointOnXAxis = intersectionPoint.x;
                     }
                     else
                     {
                         painter.LineTo(new Vector2(currPos.x + xSteps, dataPointY));
                         currPos = new Vector2(currPos.x + xSteps, dataPointY);
+                        provider.DataPointPositions[i] = currPos;
                     }
                 }
 
@@ -271,6 +299,7 @@ namespace UnityChart
                 m_DataProviders[0].AddDataPoint(Random.value * -10);
                 builder.Append(m_DataProviders[0].Dataset[i] + ", ");
             }
+            m_PositionIndicator.AddDataPointList(m_DataProviders[0].DataPointPositions);
 
             // m_DataProviders[0].Dataset = new List<float>()
             // {
@@ -285,6 +314,7 @@ namespace UnityChart
                 -0.4716486f, -1.000425f, 0.9232992f, -3.673697f, 0.6259388f, 1.672141f, -2.982634f, 1.078195f,
                 -2.848732f, -0.5303007f, -3.71349f, -2.054001f
             };
+            m_PositionIndicator.AddDataPointList(m_DataProviders[1].DataPointPositions);
 
 
             builder.Append("]");
@@ -305,6 +335,7 @@ namespace UnityChart
         public void AddDataProvider(DataProvider provider)
         {
             m_DataProviders.Add(provider);
+            m_PositionIndicator.AddDataPointList(provider.DataPointPositions);
         }
     }
 }

@@ -25,9 +25,6 @@ namespace UnityChart
 
         private float m_ChartHeightPercent = 0.8f;
         private float m_LegendHeightPercent = 0.2f;
-
-
-        
         
         public float YStart => m_PaddingUpper;
         public float YEnd => m_Height - m_PaddingBottom;
@@ -48,8 +45,11 @@ namespace UnityChart
         public float LabelMargin => m_LabelMargin;
         
         private float m_FontSize;
+        private float m_XStepLength;
+        public float XStepLength => m_XStepLength;
 
         private VisualElement m_Chart;
+
 
         public ChartLayout(float labelMargin, float fontSize, VisualElement chart)
         {
@@ -98,6 +98,23 @@ namespace UnityChart
             m_PaddingUpper = upper;
             m_PaddingLeft = left;
             m_PaddingRight = right;
+        }
+
+        public Rect GetChartDataArea()
+        {
+            Rect ans = new Rect();
+
+            ans.x = XStart + m_WidthOffset;
+            ans.y = PaddingUpper;
+            ans.width = XEnd - ans.x;
+            ans.height = ChartHeight;
+
+            return ans;
+        }
+
+        public void SetXStepLength(int datasetLength)
+        {
+            m_XStepLength = GetChartDataArea().width / datasetLength;
         }
         
         private struct LayoutValidator

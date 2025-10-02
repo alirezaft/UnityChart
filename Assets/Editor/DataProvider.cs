@@ -1,12 +1,29 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace UnityChart
 {
     public class DataProvider
     {
-        public List<float> Dataset;
+        private List<float> m_Dataset;
+        public List<float> Dataset
+        {
+            set
+            {
+                m_Dataset = value;
+                m_IsLastMinValid = false;
+                m_IsLastMaxValid = false;
+                DataPointPositions.Clear();
+                for (var i = 0; i < m_Dataset.Count; i++)
+                {
+                    DataPointPositions.Add(new Vector2());
+                }
+            }
+            get => m_Dataset;
+        }
+        internal List<Vector2> DataPointPositions; 
 
         private Color m_Color;
         public Color Color => m_Color;
@@ -20,13 +37,13 @@ namespace UnityChart
         private float m_LastMin;
 
 
-        public int Length => Dataset.Count;
+        public int Length => m_Dataset.Count;
         public float MaxValue()
         {
             if(!m_IsLastMaxValid)
             {
                 m_IsLastMaxValid = true;
-                m_LastMax = Dataset.Max();
+                m_LastMax = m_Dataset.Max();
             }
 
             return m_LastMax;
@@ -37,7 +54,7 @@ namespace UnityChart
             if(!m_IsLastMinValid)
             {
                 m_IsLastMinValid = true;
-                m_LastMin = Dataset.Min();
+                m_LastMin = m_Dataset.Min();
             }
 
             return m_LastMin;
@@ -45,7 +62,8 @@ namespace UnityChart
 
         public DataProvider(Color color, string name)
         {
-            Dataset = new List<float>();
+            m_Dataset = new List<float>();
+            DataPointPositions = new List<Vector2>();
             m_Color = color;
             m_Name = name;
 
@@ -55,12 +73,13 @@ namespace UnityChart
 
         public void AddDataPoint(float value)
         {
-            Dataset.Add(value);
+            m_Dataset.Add(value);
             if(value < m_LastMin)
                 m_IsLastMinValid = false;
 
             if (value > m_LastMax)
                 m_IsLastMaxValid = false;
+            DataPointPositions.Add(new Vector2());
         }
 
         public DataProviderLegend GetLegend()
