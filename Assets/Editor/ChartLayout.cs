@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,6 +9,9 @@ namespace UnityChart
     {
         private float m_Height;
         private float m_Width;
+
+        public readonly float MinWidth = 250f;
+        public readonly float MinHeight = 150f;
 
         public float PaddingBottom => m_PaddingBottom;
         public float PaddingUpper => m_PaddingUpper;
@@ -60,7 +64,7 @@ namespace UnityChart
             return m_WidthOffset;
         }
 
-        private float FindLongestLabelLength(List<float> yTicks)
+        public float FindLongestLabelLength(List<float> yTicks)
         {
             float ans = 0;
 
@@ -82,10 +86,46 @@ namespace UnityChart
 
         public void SetPadding(float upper, float bottom, float left, float right)
         {
+            LayoutValidator validator = new LayoutValidator(m_Width, m_Height);
+            
+            if (!validator.ValidateHorizontalPadding(left, right))
+                throw new InvalidLayoutException("Left and right paddings sum is larger than width.");
+
+            if (!validator.ValidateVerticalPadding(upper, bottom))
+                throw new InvalidLayoutException("Upper and bottom paddings sum is larger than height");
+            
             m_PaddingBottom = bottom;
             m_PaddingUpper = upper;
             m_PaddingLeft = left;
             m_PaddingRight = right;
         }
+        
+        private struct LayoutValidator
+        {
+            private float m_Height;
+            private float m_Width;
+            
+            public LayoutValidator(float height, float width)
+            {
+                m_Height = height;
+                m_Width = width;
+            }
+
+            public bool ValidateVerticalPadding(float upper, float bottom)
+            {
+                return m_Height > upper + bottom;
+            }
+            
+            public bool ValidateHorizontalPadding(float left, float right)
+            {
+                return m_Width > left + right;
+            }
+        }
+    }
+
+    public class InvalidLayoutException : Exception
+    {
+        public InvalidLayoutException(string message):base(message){}
+        public InvalidLayoutException(){}
     }
 }

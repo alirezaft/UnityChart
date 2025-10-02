@@ -33,12 +33,23 @@ namespace UnityChart
             m_DataProviders = new List<DataProvider>();
             RepopulateDataset();
             generateVisualContent += UpdateWithOldDataset;
+            
 
             m_ChartLayout = new ChartLayout(m_YLabelMargin, m_FontSize, this);
             m_Axis = new Axis(m_ChartLayout.ChartHeight, layout.width, m_ChartLayout);
             m_Ticks = new Ticks(m_Axis, m_DataProviders[0].Length, 4f, m_ChartLayout);
             m_Labels = new TickLabel(m_FontSize, m_Axis, m_ChartLayout);
             m_Legend = new ChartLegend(m_ChartLayout, this);
+        }
+
+        protected override Vector2 DoMeasure(float desiredWidth, MeasureMode widthMode, float desiredHeight, MeasureMode heightMode)
+        { 
+            var maxYLabelWidth = m_ChartLayout.FindLongestLabelLength(m_YTicks);
+            var legendHeight = m_ChartLayout.LegendHeight;
+            var contentWidth = 40 + maxYLabelWidth + 300;
+            var contentHeight = 20 + 200 + legendHeight;
+
+            return new Vector2(contentWidth, contentHeight);
         }
 
         private void CalculateMinAndMaxValues()
@@ -85,6 +96,8 @@ namespace UnityChart
 
         private void InitLayout()
         {
+            this.style.minWidth = new StyleLength(m_ChartLayout.MinWidth);
+            this.style.minHeight = new StyleLength(m_ChartLayout.MinHeight);
             m_ChartLayout.SetVisualElementDimension(layout.height, layout.width);
             
             var style = this.style;
@@ -118,6 +131,7 @@ namespace UnityChart
 
             m_Axis.SetMinAndMax(m_NiceMinY, m_NiceMaxY);
             m_Axis.DrawChartAxis();
+            
         }
 
         private void DrawLabels(MeshGenerationContext ctx)
@@ -254,16 +268,16 @@ namespace UnityChart
             //
             for (int i = 0; i < 20; i++)
             {
-                m_DataProviders[0].AddDataPoint(Random.value * 10);
+                m_DataProviders[0].AddDataPoint(Random.value * -10);
                 builder.Append(m_DataProviders[0].Dataset[i] + ", ");
             }
 
-            m_DataProviders[0].Dataset = new List<float>()
-            {
-                8.781604f, 0.364883f, 1.010233f, 3.683865f, 2.140091f, 3.60898f, 1.958959f, 4.292889f, 8.128839f,
-                8.731843f, 4.387875f, 0.8151687f, 0.2233648f, 6.665278f, 5.709448f, 6.145482f, 3.034684f, 7.503264f,
-                1.147786f, 5.586436f
-            };
+            // m_DataProviders[0].Dataset = new List<float>()
+            // {
+            //     8.781604f, 0.364883f, 1.010233f, 3.683865f, 2.140091f, 3.60898f, 1.958959f, 4.292889f, 8.128839f,
+            //     8.731843f, 4.387875f, 0.8151687f, 0.2233648f, 6.665278f, 5.709448f, 6.145482f, 3.034684f, 7.503264f,
+            //     1.147786f, 5.586436f
+            // };
 
             m_DataProviders[1].Dataset = new List<float>()
             {

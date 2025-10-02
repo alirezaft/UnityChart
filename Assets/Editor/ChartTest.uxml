@@ -1,3 +1,4 @@
 <ui:UXML xmlns:chart="UnityChart" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <chart:LineChart style="height: 178px; left: 0; padding-top: 20px;" />
+    <chart:LineChart style="height: 178px; left: 0; padding-top: 0; width: auto; padding-right: 0; padding-bottom: 20px; padding-left: 0; border-bottom-width: 5px; border-left-color: rgb(0, 0, 0); border-right-color: rgb(0, 0, 0); border-top-color: rgb(0, 0, 0); border-bottom-color: rgb(0, 0, 0);" />
+    <ui:Label text="Label Test" />
 </ui:UXML>

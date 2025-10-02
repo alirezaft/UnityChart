@@ -11,7 +11,7 @@ namespace UnityChart
         private float m_Height;
 
         private List<DataProviderLegend> m_Legends;
-        private ChartLayout m_Layout;
+        private ChartLayout m_ChartLayout;
         private ChartLegendLayout m_LegendLayout;
         private MeshGenerationContext m_Context;
         private Painter2D m_Painter;
@@ -19,7 +19,7 @@ namespace UnityChart
         public ChartLegend(ChartLayout layout, VisualElement chart)
         {
             m_Legends = new List<DataProviderLegend>();
-            m_Layout = layout;
+            m_ChartLayout = layout;
             m_LegendLayout = new ChartLegendLayout(3f, 15f, 4f, 10f, chart);
         }
 
@@ -28,10 +28,10 @@ namespace UnityChart
             if (m_Painter is null || m_Context is null)
                 throw new NullReferenceException("Provide mesh generation context and painter first.");
 
-            var widthMiddle = m_Width / 2;
+            var widthMiddle = m_ChartLayout.AllowedWidth / 2;
             var legendLength = EstimateLegendLength();
 
-            var currPos = new Vector2(widthMiddle - (legendLength / 2), m_Height - (m_Layout.LegendHeight * 0.5f));
+            var currPos = new Vector2(m_ChartLayout.XStart + widthMiddle - (legendLength / 2), m_ChartLayout.YEnd - (m_ChartLayout.LegendHeight * 0.5f));
             var textPositionVector =
                 new Vector2(m_LegendLayout.ColorIndicatorRadius + m_LegendLayout.TextAndColorSpacing, -m_LegendLayout.Fontsize / 1.5f);
 
