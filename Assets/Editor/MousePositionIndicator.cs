@@ -28,8 +28,7 @@ namespace UnityChart
                 return;
 
             var mousePos = m_MousePosition.Value;
-            // mousePos = AdjustMousePositionWithLayout(mousePos);
-            var offset = m_ChartLayout.WidthOffset + m_ChartLayout.XStart;
+            Debug.Log($"mouse posotion: {mousePos}");
 
             var painterData = new PainterSnapshot
                 { FillColor = painter.fillColor, StrokeColor = painter.strokeColor, Width = painter.lineWidth };
@@ -37,7 +36,6 @@ namespace UnityChart
             painter.lineWidth = 0.5f;
             painter.strokeColor = Color.white;
 
-            // var indicatorStepNum = (int)(mousePos.x / m_ChartLayout.XStepLength);
             var pointList = m_DataPoints[0];
             Vector2 indicatorPosition;
 
@@ -82,22 +80,39 @@ namespace UnityChart
 
         private Vector2 FindNearestPointToMouse(List<Vector2> points, float mouseX)
         {
-            int nearestIndex = 0;
-            float minDist = float.MaxValue;
+            int low = 0;
+            int high = points.Count - 1;
 
-            for (int i = 0; i < points.Count; i++)
+            while (low <= high)
             {
-                float dx = Mathf.Abs(points[i].x - mouseX);
-                if (dx < minDist)
-                {
-                    minDist = dx;
-                    nearestIndex = i;
-                }
+                int mid = (low + high) / 2;
+                float midX = points[mid].x;
+
+                if (midX < mouseX)
+                    low = mid + 1;
+                else
+                    high = mid - 1;
             }
 
-            m_LastIndex = nearestIndex;
+            
+            if (low >= points.Count)
+            {
+                m_LastIndex = points.Count - 1;
+                return points[^1];
+            }
+            if (low <= 0)
+            {
+                m_LastIndex = 0;
+                return points[0];
+            }
 
-            return points[nearestIndex];
+            float d1 = Mathf.Abs(points[low].x - mouseX);
+            float d2 = Mathf.Abs(points[low - 1].x - mouseX);
+
+            m_LastIndex = d1 < d2 ? low : low - 1;
+            
+            return points[m_LastIndex];
+
         }
 
         private Vector2 FindNearestPointToMouse(Vector2 currPoint, Vector2 pointBefore, Vector2 pointAfter,

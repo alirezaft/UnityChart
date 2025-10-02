@@ -115,7 +115,6 @@ namespace UnityChart
             result.Add(tick);
         }
 
-        Debug.Log($"Ticks: [{string.Join(", ", result)}], Spacing: {tickSpacing}");
         return result;
     }
 

@@ -60,7 +60,7 @@ namespace UnityChart
 
         private void UpdateMouseIndicatorPosition(MouseMoveEvent evt)
         {
-            m_PositionIndicator.UpdateMousePosition(evt.mousePosition);
+            m_PositionIndicator.UpdateMousePosition(evt.localMousePosition);
             MarkDirtyRepaint();
         }
 
@@ -125,7 +125,6 @@ namespace UnityChart
             m_ChartLayout.SetVisualElementDimension(layout.height, layout.width);
 
             var style = this.style;
-            Debug.Log($"paddingTop: {resolvedStyle.paddingTop}");
             m_ChartLayout.SetPadding(Utils.LengthToFloat(resolvedStyle.paddingTop), Utils.LengthToFloat(resolvedStyle.paddingBottom),
                 Utils.LengthToFloat(resolvedStyle.paddingLeft),
                 Utils.LengthToFloat(resolvedStyle.paddingRight));
@@ -175,7 +174,6 @@ namespace UnityChart
                 var offset = m_ChartLayout.CaclulateWidthOffset(m_YTicks);
                 var latestPointOnXAxis = offset + m_ChartLayout.XStart;
                 var xSteps = (m_ChartLayout.AllowedWidth - offset) / (provider.Length - 1);
-                Debug.Log($"data steps x2 {xSteps}");
 
                 painter.BeginPath();
                 painter.lineWidth = 1.5f;
@@ -188,7 +186,6 @@ namespace UnityChart
 
 
                 var currPos = new Vector2(offset + m_ChartLayout.XStart, YPos);
-                Debug.Log($"points length: {provider.DataPointPositions.Count}");
                 provider.DataPointPositions[0] = currPos;
                 painter.LineTo(currPos);
                 var dataset = provider.Dataset;
@@ -203,8 +200,7 @@ namespace UnityChart
                     {
                         var nextPoint = new Vector2(currPos.x + xSteps, dataPointY);
                         var intersectionPoint = FindIntersectionWithXAxis(currPos, nextPoint);
-                        // Debug.Log($"intersection {intersectionPoint}");
-
+    
                         painter.LineTo(intersectionPoint);
                         painter.LineTo(new Vector2(latestPointOnXAxis, m_Axis.ZeroOnYAxis));
                         painter.ClosePath();

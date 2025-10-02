@@ -88,9 +88,6 @@ namespace UnityChart
             float t = m_NiceMaxY / (Mathf.Abs(m_NiceMinY) + m_NiceMaxY);
             m_ZeroOnYAxisPosition = m_ChartLayout.YStart + t * m_ChartLayout.ChartHeight;
             
-            Debug.Log($"zero pos: {m_ZeroOnYAxisPosition}");
-
-
             m_Painter.MoveTo(new Vector2(m_ChartLayout.WidthOffset + m_ChartLayout.XStart, m_ZeroOnYAxisPosition));
             m_Painter.LineTo(new Vector2(m_ChartLayout.XEnd, m_ZeroOnYAxisPosition));
             m_Painter.lineWidth = originalWidth;

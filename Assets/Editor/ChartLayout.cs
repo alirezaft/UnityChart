@@ -105,7 +105,7 @@ namespace UnityChart
             Rect ans = new Rect();
 
             ans.x = XStart + m_WidthOffset;
-            ans.y = PaddingUpper;
+            ans.y = YStart;
             ans.width = XEnd - ans.x;
             ans.height = ChartHeight;
 

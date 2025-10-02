@@ -26,7 +26,6 @@ namespace UnityChart
         public void PlaceTicksOnYAxis(int ticksCount)
         {
             var tickDistance = m_ChartLayout.ChartHeight / (ticksCount - 1);
-            Debug.Log($"tickDistance: {tickDistance}, tickCount: {ticksCount}");
             var tickVector = new Vector2(m_TickLength, 0);
             var painterStepVector = new Vector2(0, tickDistance);
 
@@ -56,9 +55,7 @@ namespace UnityChart
             var dataToTickRatio = ((float)m_DataLength - 1) / (ticksList.Count - 1);
 
 
-            Debug.Log("Num of Ticks: " + numberOfTicks);
             var tickDistance = dataSteps * dataToTickRatio;
-            Debug.Log($"Tick distance: {tickDistance}");
             var painterMovementVector = new Vector2(tickDistance, -m_TickLength);
             var tickLengthVector = new Vector2(0, m_TickLength);
             var currPosition = new Vector2(0, m_Axis.ZeroOnYAxis) + tickLengthVector;
@@ -68,7 +65,6 @@ namespace UnityChart
 
             for (int i = 0; i < numberOfTicks; i++)
             {
-                Debug.Log(currPosition);
                 painter.BeginPath();
                 painter.MoveTo(currPosition + painterMovementVector);
                 currPosition += painterMovementVector;
