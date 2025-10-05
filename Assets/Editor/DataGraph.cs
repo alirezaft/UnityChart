@@ -9,7 +9,6 @@ namespace UnityChart
         private List<DataProvider> m_DataProviders;
         private float m_NiceMaxY;
         private float m_NiceMinY;
-        private List<float> m_YTicks;
         private Axis m_Axis;
         private ChartLayout m_ChartLayout;
 
@@ -24,12 +23,12 @@ namespace UnityChart
         {
             foreach (var provider in m_DataProviders)
             {
-                var offset = m_ChartLayout.CaclulateWidthOffset(m_YTicks);
+                var offset = m_ChartLayout.WidthOffset;
                 var latestPointOnXAxis = offset + m_ChartLayout.XStart;
                 var xSteps = (m_ChartLayout.AllowedWidth - offset) / (provider.Length - 1);
 
                 painter.BeginPath();
-                painter.lineWidth = 1.5f;
+                painter.lineWidth = 1f;
                 painter.strokeColor = provider.Color;
                 painter.fillColor = new Color(provider.Color.r, provider.Color.g, provider.Color.b, 0.3f);
                 painter.MoveTo(new Vector2(offset + m_ChartLayout.XStart, m_Axis.ZeroOnYAxis));
@@ -98,13 +97,8 @@ namespace UnityChart
             float destinationMin, float destinationMax)
         {
             float t = (value - sourceMin) / (sourceMax - sourceMin);
-            // flip because UI Toolkit Y increases downward
+            
             return Mathf.Lerp(destinationMax, destinationMin, t);
-        }
-
-        public void SetTicks(List<float> yTicks)
-        {
-            m_YTicks = yTicks;
         }
 
         public void SetMinAndMax(float minY, float maxY)

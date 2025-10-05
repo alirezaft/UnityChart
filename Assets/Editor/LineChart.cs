@@ -178,7 +178,6 @@ namespace UnityChart
 
         private void DrawDataGraph(Painter2D painter)
         {
-            m_DataGraph.SetTicks(m_YTicks);
             m_DataGraph.SetMinAndMax(m_NiceMinY, m_NiceMaxY);
             m_DataGraph.DrawDataGraphs(painter);
         }
