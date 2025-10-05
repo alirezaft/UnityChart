@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
 
 namespace UnityChart
@@ -27,7 +28,7 @@ namespace UnityChart
                 return;
 
             var dataTexts = GetDataTexts(dataIndex);
-            var titleText = $"#{dataIndex}";
+            var titleText = $"#{dataIndex + 1}";
 
             var longestLength = FindLongestText(dataTexts, titleText);
             var isOnRight = IsToolTipOnRight(longestLength);
@@ -35,8 +36,20 @@ namespace UnityChart
 
             var height = GetTooltipHeight(dataTexts, titleText);
             var width = GetTooltipWidth(longestLength);
+
+            Vector2 boxStartPoint;
+            
+            if(isOnRight)
+                boxStartPoint = new Vector2(indicatorX + (m_TooltipLayout.Margin * sign),
+                    m_ChartLayout.YStart + m_TooltipLayout.Margin); 
+            else
+                boxStartPoint = new Vector2(indicatorX + ((width + m_TooltipLayout.Margin) * sign),
+                    m_ChartLayout.YStart + m_TooltipLayout.Margin);
+            
+            // var 
             
             DrawTooltipBox(width, height, sign, indicatorX, painter);
+            DrawTitle(titleText, ctx, boxStartPoint, height, width);
         }
 
         private bool IsToolTipOnRight(float longestLabel)
@@ -131,6 +144,12 @@ namespace UnityChart
             painter.ClosePath();
             
             painterSnapshot.RestorePainterData(painter);
+        }
+
+        private void DrawTitle(string title, MeshGenerationContext ctx, Vector2 boxBeginningPoint, float height, float width)
+        {
+            var position = boxBeginningPoint + new Vector2(m_TooltipLayout.Padding, m_TooltipLayout.Padding);
+            ctx.DrawText(title, position, m_TooltipLayout.TitleFontSize, Color.white);
         }
 
         public void UpdateMousePosition(Vector2 position)
