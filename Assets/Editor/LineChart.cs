@@ -64,8 +64,9 @@ namespace UnityChart
             MarkDirtyRepaint();
         }
 
-        protected override Vector2 DoMeasure(float desiredWidth, MeasureMode widthMode, float desiredHeight, MeasureMode heightMode)
-        { 
+        protected override Vector2 DoMeasure(float desiredWidth, MeasureMode widthMode, float desiredHeight,
+            MeasureMode heightMode)
+        {
             var maxYLabelWidth = m_ChartLayout.FindLongestLabelLength(m_YTicks);
             var legendHeight = m_ChartLayout.LegendHeight;
             var contentWidth = 40 + maxYLabelWidth + 300;
@@ -104,7 +105,7 @@ namespace UnityChart
         {
             InitLayout();
             var painter = ctx.painter2D;
-            
+
             CalculateMinAndMaxValues();
             CalculateAxisScaleAndOffset();
             DrawAxes(ctx.painter2D);
@@ -114,7 +115,7 @@ namespace UnityChart
 
             DrawDataGraphs(painter);
             DrawChartLegend(painter, ctx);
-            
+
             m_PositionIndicator.Draw(painter);
         }
 
@@ -125,9 +126,14 @@ namespace UnityChart
             m_ChartLayout.SetVisualElementDimension(layout.height, layout.width);
 
             var style = this.style;
-            m_ChartLayout.SetPadding(Utils.LengthToFloat(resolvedStyle.paddingTop), Utils.LengthToFloat(resolvedStyle.paddingBottom),
+            m_ChartLayout.SetPadding(Utils.LengthToFloat(resolvedStyle.paddingTop),
+                Utils.LengthToFloat(resolvedStyle.paddingBottom),
                 Utils.LengthToFloat(resolvedStyle.paddingLeft),
                 Utils.LengthToFloat(resolvedStyle.paddingRight));
+
+            m_ChartLayout.SetBorder(resolvedStyle.borderTopWidth, resolvedStyle.borderBottomWidth,
+                resolvedStyle.borderLeftWidth, resolvedStyle.borderRightWidth);
+            
             m_ChartLayout.SetXStepLength(Utils.GetMaxDataProviderLength(m_DataProviders));
         }
 
@@ -155,7 +161,6 @@ namespace UnityChart
 
             m_Axis.SetMinAndMax(m_NiceMinY, m_NiceMaxY);
             m_Axis.DrawChartAxis();
-            
         }
 
         private void DrawLabels(MeshGenerationContext ctx)
@@ -179,7 +184,7 @@ namespace UnityChart
                 painter.lineWidth = 1.5f;
                 painter.strokeColor = provider.Color;
                 painter.fillColor = new Color(provider.Color.r, provider.Color.g, provider.Color.b, 0.3f);
-                painter.MoveTo(new Vector2(offset + m_ChartLayout.XStart,  m_Axis.ZeroOnYAxis));
+                painter.MoveTo(new Vector2(offset + m_ChartLayout.XStart, m_Axis.ZeroOnYAxis));
                 var YPos = FindValueOnChartYAxis(provider.Dataset[0],
                     m_NiceMinY,
                     m_NiceMaxY, m_ChartLayout.YStart, m_ChartLayout.ChartHeight + m_ChartLayout.YStart);
@@ -200,7 +205,7 @@ namespace UnityChart
                     {
                         var nextPoint = new Vector2(currPos.x + xSteps, dataPointY);
                         var intersectionPoint = FindIntersectionWithXAxis(currPos, nextPoint);
-    
+
                         painter.LineTo(intersectionPoint);
                         painter.LineTo(new Vector2(latestPointOnXAxis, m_Axis.ZeroOnYAxis));
                         painter.ClosePath();
@@ -296,6 +301,7 @@ namespace UnityChart
                 m_DataProviders[0].AddDataPoint(Random.value * -10);
                 builder.Append(m_DataProviders[0].Dataset[i] + ", ");
             }
+
             m_PositionIndicator.AddDataPointList(m_DataProviders[0].DataPointPositions);
 
             // m_DataProviders[0].Dataset = new List<float>()

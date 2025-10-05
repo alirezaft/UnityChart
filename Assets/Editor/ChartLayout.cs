@@ -17,19 +17,29 @@ namespace UnityChart
         public float PaddingUpper => m_PaddingUpper;
         public float PaddingLeft => m_PaddingLeft;
         public float PaddingRight => m_PaddingRight;
-        
+
+        public float BorderTop => m_BorderTop;
+        public float BorderBottom => m_BorderBottom;
+        public float BorderLeft => m_BorderLeft;
+        public float BorderRight => m_BorderRight;
+
         private float m_PaddingBottom = 0;
         private float m_PaddingUpper = 0;
         private float m_PaddingLeft = 0;
         private float m_PaddingRight = 0;
 
+        private float m_BorderTop;
+        private float m_BorderBottom;
+        private float m_BorderLeft;
+        private float m_BorderRight;
+
         private float m_ChartHeightPercent = 0.8f;
         private float m_LegendHeightPercent = 0.2f;
-        
-        public float YStart => m_PaddingUpper;
-        public float YEnd => m_Height - m_PaddingBottom;
-        public float XStart => m_PaddingLeft;
-        public float XEnd => m_Width - m_PaddingRight;
+
+        public float YStart => m_PaddingUpper + m_BorderTop;
+        public float YEnd => m_Height - m_PaddingBottom - m_BorderBottom;
+        public float XStart => m_PaddingLeft + m_BorderLeft;
+        public float XEnd => m_Width - m_PaddingRight - m_BorderRight;
 
         public float AllowedHeight => YEnd - YStart;
         public float AllowedWidth => XEnd - XStart;
@@ -37,13 +47,13 @@ namespace UnityChart
 
         public float ChartHeight => AllowedHeight * m_ChartHeightPercent;
         public float LegendHeight => AllowedHeight * m_LegendHeightPercent;
-        
+
         private float m_WidthOffset;
         public float WidthOffset => m_WidthOffset;
-        
+
         private float m_LabelMargin;
         public float LabelMargin => m_LabelMargin;
-        
+
         private float m_FontSize;
         private float m_XStepLength;
         public float XStepLength => m_XStepLength;
@@ -86,18 +96,30 @@ namespace UnityChart
 
         public void SetPadding(float upper, float bottom, float left, float right)
         {
-            LayoutValidator validator = new LayoutValidator(m_Width, m_Height);
-            
-            if (!validator.ValidateHorizontalPadding(left, right))
-                throw new InvalidLayoutException("Left and right paddings sum is larger than width.");
+            ValidateLayout("Padding values are invalid.");
 
-            if (!validator.ValidateVerticalPadding(upper, bottom))
-                throw new InvalidLayoutException("Upper and bottom paddings sum is larger than height");
-            
             m_PaddingBottom = bottom;
             m_PaddingUpper = upper;
             m_PaddingLeft = left;
             m_PaddingRight = right;
+        }
+
+        public void SetBorder(float top, float bottom, float left, float right)
+        {
+            ValidateLayout("Border values are invalid.");
+            
+            m_BorderTop = top;
+            m_BorderBottom = bottom;
+            m_BorderLeft = left;
+            m_BorderRight = right;
+        }
+
+        private void ValidateLayout(string errorMessage)
+        {
+            LayoutValidator validator = new LayoutValidator(this);
+
+            if (!validator.ValidateLayout())
+                throw new InvalidLayoutException(errorMessage);
         }
 
         public Rect GetChartDataArea()
@@ -116,33 +138,43 @@ namespace UnityChart
         {
             m_XStepLength = GetChartDataArea().width / datasetLength;
         }
-        
+
         private struct LayoutValidator
         {
-            private float m_Height;
-            private float m_Width;
-            
-            public LayoutValidator(float height, float width)
+            private ChartLayout m_Layout;
+
+            public LayoutValidator(ChartLayout layout)
             {
-                m_Height = height;
-                m_Width = width;
+                m_Layout = layout;
             }
 
-            public bool ValidateVerticalPadding(float upper, float bottom)
+            public bool ValidateVerticalDimensions()
             {
-                return m_Height > upper + bottom;
+                return m_Layout.m_Width > m_Layout.m_PaddingUpper + m_Layout.m_PaddingBottom + m_Layout.m_BorderTop +
+                    m_Layout.m_BorderBottom;
             }
-            
-            public bool ValidateHorizontalPadding(float left, float right)
+
+            public bool ValidateHorizontalDimensions()
             {
-                return m_Width > left + right;
+                return m_Layout.m_Height > m_Layout.m_PaddingLeft + m_Layout.m_PaddingRight + m_Layout.m_BorderLeft +
+                    m_Layout.m_BorderRight;
+            }
+
+            public bool ValidateLayout()
+            {
+                return ValidateHorizontalDimensions() & ValidateVerticalDimensions();
             }
         }
     }
 
     public class InvalidLayoutException : Exception
     {
-        public InvalidLayoutException(string message):base(message){}
-        public InvalidLayoutException(){}
+        public InvalidLayoutException(string message) : base(message)
+        {
+        }
+
+        public InvalidLayoutException()
+        {
+        }
     }
 }
