@@ -28,6 +28,7 @@ namespace UnityChart
         private ChartLayout m_ChartLayout;
         private ChartLegend m_Legend;
         private MousePositionIndicator m_PositionIndicator;
+        private readonly DataGraph m_DataGraph;
 
         public LineChart()
         {
@@ -39,12 +40,15 @@ namespace UnityChart
             m_PositionIndicator = new MousePositionIndicator(m_ChartLayout);
             RepopulateDataset();
             m_Axis = new Axis(m_ChartLayout.ChartHeight, layout.width, m_ChartLayout);
+            m_DataGraph = new DataGraph(m_ChartLayout, m_Axis, m_DataProviders);
             m_Ticks = new Ticks(m_Axis, m_DataProviders[0].Length, 4f, m_ChartLayout);
             m_Labels = new TickLabel(m_FontSize, m_Axis, m_ChartLayout);
             m_Legend = new ChartLegend(m_ChartLayout, this);
 
             RegisterChartEvents();
         }
+
+        
 
         private void RegisterChartEvents()
         {
@@ -113,7 +117,7 @@ namespace UnityChart
             DrawTicks(painter, ctx);
             DrawLabels(ctx);
 
-            DrawDataGraphs(painter);
+            DrawDataGraph(painter);
             DrawChartLegend(painter, ctx);
 
             m_PositionIndicator.Draw(painter);
@@ -172,78 +176,11 @@ namespace UnityChart
             m_Labels.PlaceYAxisTickLabels(m_YTicks);
         }
 
-        private void DrawDataGraphs(Painter2D painter)
+        private void DrawDataGraph(Painter2D painter)
         {
-            foreach (var provider in m_DataProviders)
-            {
-                var offset = m_ChartLayout.CaclulateWidthOffset(m_YTicks);
-                var latestPointOnXAxis = offset + m_ChartLayout.XStart;
-                var xSteps = (m_ChartLayout.AllowedWidth - offset) / (provider.Length - 1);
-
-                painter.BeginPath();
-                painter.lineWidth = 1.5f;
-                painter.strokeColor = provider.Color;
-                painter.fillColor = new Color(provider.Color.r, provider.Color.g, provider.Color.b, 0.3f);
-                painter.MoveTo(new Vector2(offset + m_ChartLayout.XStart, m_Axis.ZeroOnYAxis));
-                var YPos = FindValueOnChartYAxis(provider.Dataset[0],
-                    m_NiceMinY,
-                    m_NiceMaxY, m_ChartLayout.YStart, m_ChartLayout.ChartHeight + m_ChartLayout.YStart);
-
-
-                var currPos = new Vector2(offset + m_ChartLayout.XStart, YPos);
-                provider.DataPointPositions[0] = currPos;
-                painter.LineTo(currPos);
-                var dataset = provider.Dataset;
-
-                for (int i = 1; i < dataset.Count; i++)
-                {
-                    var dataPointY = FindValueOnChartYAxis(dataset[i], m_NiceMinY,
-                        m_NiceMaxY,
-                        m_ChartLayout.YStart, m_ChartLayout.ChartHeight + m_ChartLayout.YStart);
-
-                    if (Utils.DoValuesHaveDifferentSigns(dataset[i], dataset[i - 1]))
-                    {
-                        var nextPoint = new Vector2(currPos.x + xSteps, dataPointY);
-                        var intersectionPoint = FindIntersectionWithXAxis(currPos, nextPoint);
-
-                        painter.LineTo(intersectionPoint);
-                        painter.LineTo(new Vector2(latestPointOnXAxis, m_Axis.ZeroOnYAxis));
-                        painter.ClosePath();
-                        painter.Stroke();
-                        painter.Fill();
-
-                        painter.BeginPath();
-                        painter.MoveTo(intersectionPoint);
-                        painter.LineTo(new Vector2(currPos.x + xSteps, dataPointY));
-
-                        currPos = new Vector2(currPos.x + xSteps, dataPointY);
-                        provider.DataPointPositions[i] = currPos;
-                        latestPointOnXAxis = intersectionPoint.x;
-                    }
-                    else
-                    {
-                        painter.LineTo(new Vector2(currPos.x + xSteps, dataPointY));
-                        currPos = new Vector2(currPos.x + xSteps, dataPointY);
-                        provider.DataPointPositions[i] = currPos;
-                    }
-                }
-
-                painter.LineTo(new Vector2(currPos.x, m_Axis.ZeroOnYAxis));
-                painter.ClosePath();
-                painter.Stroke();
-                painter.Fill();
-            }
-
-            painter.lineWidth = 2;
-        }
-
-        private Vector2 FindIntersectionWithXAxis(Vector2 point1, Vector2 point2)
-        {
-            var slope = (point1.y - point2.y) / (point1.x - point2.x);
-
-            var yIntercept = new Vector2(point1.y - (slope * point1.x), m_Axis.ZeroOnYAxis);
-
-            return new Vector2((m_Axis.ZeroOnYAxis - yIntercept.x) / slope, m_Axis.ZeroOnYAxis);
+            m_DataGraph.SetTicks(m_YTicks);
+            m_DataGraph.SetMinAndMax(m_NiceMinY, m_NiceMaxY);
+            m_DataGraph.DrawDataGraphs(painter);
         }
 
         private void CalculateAxisScaleAndOffset()
@@ -267,14 +204,6 @@ namespace UnityChart
             m_Ticks.SetDimensions(m_ChartLayout.ChartHeight, layout.width);
             m_Ticks.SetPainter(painter);
             m_Ticks.PlaceTicksOnYAxis(m_YTicks.Count);
-        }
-
-        private float FindValueOnChartYAxis(float value, float sourceMin, float sourceMax,
-            float destinationMin, float destinationMax)
-        {
-            float t = (value - sourceMin) / (sourceMax - sourceMin);
-            // flip because UI Toolkit Y increases downward
-            return Mathf.Lerp(destinationMax, destinationMin, t);
         }
 
         public void RepopulateDataset()
