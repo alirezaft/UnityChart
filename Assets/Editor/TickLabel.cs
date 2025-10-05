@@ -34,7 +34,7 @@ namespace UnityChart
             for (int i = 0; i < ticks.Count; i++)
             {
                 var text = ticks[i].ToString();
-                var labelLength = Utils.EstimateLabelLengthInPixels(text, m_MeshGenerationContext.visualElement, (int)m_FontSize);
+                var labelLength = Utils.EstimateLabelDimensionInPixels(text, m_MeshGenerationContext.visualElement, (int)m_FontSize).x;
                 var offset = new Vector2(m_ChartLayout.WidthOffset - labelLength - m_ChartLayout.LabelMargin, 0);
 
                 if(i < ticks.Count - 1){

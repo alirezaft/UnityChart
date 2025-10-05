@@ -13,11 +13,10 @@ namespace UnityChart
             return (int)Math.Floor(Math.Log10(n) + 1);
             ;
         }
-
-        public static float EstimateLabelLengthInPixels(string text, VisualElement contextElement, int fontSize,
+        
+        public static Vector2 EstimateLabelDimensionInPixels(string text, VisualElement contextElement, int fontSize,
             FontStyle fontStyle = FontStyle.Normal)
         {
-            // Use a temporary label to measure
             var temp = new Label(text)
             {
                 style =
@@ -28,7 +27,6 @@ namespace UnityChart
                 }
             };
 
-            // UI Toolkit can measure text size with this method:
             Vector2 size = temp.MeasureTextSize(
                 text,
                 0, // no width restriction
@@ -37,7 +35,7 @@ namespace UnityChart
                 VisualElement.MeasureMode.Undefined
             );
 
-            return size.x; // width in local coordinates
+            return size;
         }
 
         public static float GetNiceStep(float range, int maxTicks)

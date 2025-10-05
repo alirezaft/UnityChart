@@ -33,7 +33,7 @@ namespace UnityChart
         {
             var ans = m_ColorIndicatorRadius * 2;
             ans += m_TextAndColorSpacing;
-            ans += Utils.EstimateLabelLengthInPixels(legend.Name, m_ChartElement, (int)m_FontSize);
+            ans += Utils.EstimateLabelDimensionInPixels(legend.Name, m_ChartElement, (int)m_FontSize).x;
 
             return ans;
         }

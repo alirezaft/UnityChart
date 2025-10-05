@@ -8,10 +8,14 @@ namespace UnityChart
     {
         private ChartLayout m_ChartLayout;
         private Vector2? m_MousePosition;
+        private float m_IndicatorLinePosition;
 
         private List<List<Vector2>> m_DataPoints;
         private bool m_FirstSearch;
         private int m_LastIndex;
+        
+        public int CurrentIndex => m_LastIndex;
+        public float IndicatorXPosition => m_IndicatorLinePosition;
 
         public MousePositionIndicator(ChartLayout layout)
         {
@@ -28,7 +32,6 @@ namespace UnityChart
                 return;
 
             var mousePos = m_MousePosition.Value;
-            Debug.Log($"mouse posotion: {mousePos}");
 
             var painterData = new PainterSnapshot
                 { FillColor = painter.fillColor, StrokeColor = painter.strokeColor, Width = painter.lineWidth };
@@ -48,6 +51,8 @@ namespace UnityChart
 
                 indicatorPosition = FindNearestPointToMouse(pointList[m_LastIndex], pointBefore, pointAfter, mousePos);
             }
+
+            m_IndicatorLinePosition = indicatorPosition.x;
 
             painter.BeginPath();
             painter.MoveTo(new Vector2(indicatorPosition.x, m_ChartLayout.YStart));

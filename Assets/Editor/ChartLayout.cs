@@ -80,7 +80,7 @@ namespace UnityChart
 
             foreach (var tick in yTicks)
             {
-                var currLength = Utils.EstimateLabelLengthInPixels(tick.ToString(), m_Chart, (int)m_FontSize);
+                var currLength = Utils.EstimateLabelDimensionInPixels(tick.ToString(), m_Chart, (int)m_FontSize).x;
                 if (ans < currLength)
                     ans = currLength;
             }

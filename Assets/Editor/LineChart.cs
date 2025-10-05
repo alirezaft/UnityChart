@@ -28,7 +28,8 @@ namespace UnityChart
         private ChartLayout m_ChartLayout;
         private ChartLegend m_Legend;
         private MousePositionIndicator m_PositionIndicator;
-        private readonly DataGraph m_DataGraph;
+        private DataGraph m_DataGraph;
+        private ChartTooltip m_Tooltip;
 
         public LineChart()
         {
@@ -44,6 +45,7 @@ namespace UnityChart
             m_Ticks = new Ticks(m_Axis, m_DataProviders[0].Length, 4f, m_ChartLayout);
             m_Labels = new TickLabel(m_FontSize, m_Axis, m_ChartLayout);
             m_Legend = new ChartLegend(m_ChartLayout, this);
+            m_Tooltip = new ChartTooltip(m_ChartLayout, m_DataProviders, this);
 
             RegisterChartEvents();
         }
@@ -53,18 +55,27 @@ namespace UnityChart
         private void RegisterChartEvents()
         {
             RegisterCallback<MouseMoveEvent>(UpdateMouseIndicatorPosition);
+            RegisterCallback<MouseMoveEvent>(UpdateTooltipPosition);
+            
             RegisterCallback<MouseLeaveEvent>(ResetMouseIndicator);
         }
 
         private void ResetMouseIndicator(MouseLeaveEvent evt)
         {
             m_PositionIndicator.Reset();
+            m_Tooltip.Reset();
             MarkDirtyRepaint();
         }
 
         private void UpdateMouseIndicatorPosition(MouseMoveEvent evt)
         {
             m_PositionIndicator.UpdateMousePosition(evt.localMousePosition);
+            MarkDirtyRepaint();
+        }
+
+        private void UpdateTooltipPosition(MouseMoveEvent evt)
+        {
+            m_Tooltip.UpdateMousePosition(evt.localMousePosition);
             MarkDirtyRepaint();
         }
 
@@ -121,6 +132,7 @@ namespace UnityChart
             DrawChartLegend(painter, ctx);
 
             m_PositionIndicator.Draw(painter);
+            DrawTooltip(painter, ctx);
         }
 
         private void InitLayout()
@@ -154,6 +166,11 @@ namespace UnityChart
             m_Legend.SetDimension(layout.height, layout.width);
 
             m_Legend.DrawLegends();
+        }
+
+        private void DrawTooltip(Painter2D painter, MeshGenerationContext context)
+        {
+            m_Tooltip.DrawTooltip(painter, context, m_PositionIndicator.CurrentIndex, m_PositionIndicator.IndicatorXPosition);
         }
 
         private void DrawAxes(Painter2D painter)
