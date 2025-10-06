@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityChart.Runtime;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Random = UnityEngine.Random;
 
 namespace UnityChart.Editor
 {
@@ -10,6 +13,8 @@ namespace UnityChart.Editor
     public partial class LineChart : VisualElement
     {
         private List<DataProvider> m_DataProviders;
+
+        [UxmlAttribute("data-providers")] public string DataProviderIDs;
 
         private float m_MinY;
         private float m_MaxY;
@@ -23,6 +28,8 @@ namespace UnityChart.Editor
         private List<float> m_XTicks;
         private List<float> m_YTicks;
 
+        private bool m_IsChartInitiated;
+
         private Axis m_Axis;
         private Ticks m_Ticks;
         private TickLabel m_Labels;
@@ -35,30 +42,38 @@ namespace UnityChart.Editor
         public LineChart()
         {
             m_DataProviders = new List<DataProvider>();
+            // GetDataProviders();
             generateVisualContent += UpdateWithOldDataset;
-
-
-            m_ChartLayout = new ChartLayout(m_YLabelMargin, m_FontSize, this);
-            m_PositionIndicator = new MousePositionIndicator(m_ChartLayout);
-            RepopulateDataset();
-            m_Axis = new Axis(m_ChartLayout.ChartHeight, layout.width, m_ChartLayout);
-            m_DataGraph = new DataGraph(m_ChartLayout, m_Axis, m_DataProviders);
-            m_Ticks = new Ticks(m_Axis, m_DataProviders[0].Length, 4f, m_ChartLayout);
-            m_Labels = new TickLabel(m_FontSize, m_Axis, m_ChartLayout);
-            m_Legend = new ChartLegend(m_ChartLayout, this);
-            m_Tooltip = new ChartTooltip(m_ChartLayout, m_DataProviders, this);
-
-            RegisterChartEvents();
         }
 
+        private void GetDataProviders()
+        {
+            m_DataProviders.Clear();
+            string[] ids = ParseIDs();
+
+            foreach (var id in ids)
+            {
+                var provider = DataProviderRegistry.instance.GetDataProvider(id);
+                provider.OnDataChanged += MarkDirtyRepaint;
+                m_DataProviders.Add(provider);
+            }
+        }
         
+        private string[] ParseIDs()
+        {
+            return DataProviderIDs.Split(new[] { ","}, StringSplitOptions.None)
+                .Select(s => s.Trim())
+                .ToArray();
+        }
 
         private void RegisterChartEvents()
         {
             RegisterCallback<MouseMoveEvent>(UpdateMouseIndicatorPosition);
             RegisterCallback<MouseMoveEvent>(UpdateTooltipPosition);
-            
+
             RegisterCallback<MouseLeaveEvent>(ResetMouseIndicator);
+            
+            RegisterCallback<AttachToPanelEvent>(ParseDataProviderAttribute);
         }
 
         private void ResetMouseIndicator(MouseLeaveEvent evt)
@@ -72,6 +87,11 @@ namespace UnityChart.Editor
         {
             m_PositionIndicator.UpdateMousePosition(evt.localMousePosition);
             MarkDirtyRepaint();
+        }
+
+        private void ParseDataProviderAttribute(AttachToPanelEvent evt)
+        {
+            
         }
 
         private void UpdateTooltipPosition(MouseMoveEvent evt)
@@ -119,6 +139,22 @@ namespace UnityChart.Editor
 
         private void UpdateWithOldDataset(MeshGenerationContext ctx)
         {
+            if (!m_IsChartInitiated)
+            {
+                m_IsChartInitiated = true;
+                GetDataProviders();
+                m_ChartLayout = new ChartLayout(m_YLabelMargin, m_FontSize, this);
+                m_PositionIndicator = new MousePositionIndicator(m_ChartLayout);
+                m_Axis = new Axis(m_ChartLayout.ChartHeight, layout.width, m_ChartLayout);
+                m_DataGraph = new DataGraph(m_ChartLayout, m_Axis, m_DataProviders);
+                m_Ticks = new Ticks(m_Axis, m_DataProviders[0].Length, 4f, m_ChartLayout);
+                m_Labels = new TickLabel(m_FontSize, m_Axis, m_ChartLayout);
+                m_Legend = new ChartLegend(m_ChartLayout, this);
+                m_Tooltip = new ChartTooltip(m_ChartLayout, m_DataProviders, this);
+
+                RegisterChartEvents();
+                // MarkDirtyRepaint();
+            }
             InitLayout();
             var painter = ctx.painter2D;
 
@@ -150,7 +186,7 @@ namespace UnityChart.Editor
 
             m_ChartLayout.SetBorder(resolvedStyle.borderTopWidth, resolvedStyle.borderBottomWidth,
                 resolvedStyle.borderLeftWidth, resolvedStyle.borderRightWidth);
-            
+
             m_ChartLayout.SetXStepLength(Utils.GetMaxDataProviderLength(m_DataProviders));
         }
 
@@ -171,7 +207,8 @@ namespace UnityChart.Editor
 
         private void DrawTooltip(Painter2D painter, MeshGenerationContext context)
         {
-            m_Tooltip.DrawTooltip(painter, context, m_PositionIndicator.CurrentIndex, m_PositionIndicator.IndicatorXPosition);
+            m_Tooltip.DrawTooltip(painter, context, m_PositionIndicator.CurrentIndex,
+                m_PositionIndicator.IndicatorXPosition);
         }
 
         private void DrawAxes(Painter2D painter)
@@ -222,65 +259,7 @@ namespace UnityChart.Editor
             m_Ticks.SetPainter(painter);
             m_Ticks.PlaceTicksOnYAxis(m_YTicks.Count);
         }
-
-        public void RepopulateDataset()
-        {
-            m_DataProviders.Clear();
-            m_DataProviders.Add(new DataProvider(Color.green, "Test"));
-            // m_DataProviders[0].Dataset = new List<float>() { 1, 0, 1, 2, -3, 5 };
-            m_DataProviders.Add(new DataProvider(Color.red, "Test2"));
-            // m_DataProviders[0].AddDataPoint(0);
-            // m_DataProviders[0].AddDataPoint(1);
-            // m_DataProviders[0].AddDataPoint(3);
-            // m_DataProviders[0].AddDataPoint(-2);
-
-            // m_DataProviders[0].AddDataPoint(-3);
-            StringBuilder builder = new StringBuilder();
-            builder.Append("Dataset 1: [");
-            // foreach (var f in m_DataProviders[0].Dataset)
-            // {
-            //     builder.Append(f + ", ");
-            // }
-            //
-            for (int i = 0; i < 20; i++)
-            {
-                m_DataProviders[0].AddDataPoint(Random.value * -10);
-                builder.Append(m_DataProviders[0].Dataset[i] + ", ");
-            }
-
-            m_PositionIndicator.AddDataPointList(m_DataProviders[0].DataPointPositions);
-
-            // m_DataProviders[0].Dataset = new List<float>()
-            // {
-            //     8.781604f, 0.364883f, 1.010233f, 3.683865f, 2.140091f, 3.60898f, 1.958959f, 4.292889f, 8.128839f,
-            //     8.731843f, 4.387875f, 0.8151687f, 0.2233648f, 6.665278f, 5.709448f, 6.145482f, 3.034684f, 7.503264f,
-            //     1.147786f, 5.586436f
-            // };
-
-            m_DataProviders[1].Dataset = new List<float>()
-            {
-                -2.749644f, -0.6666476f, 1.935474f, 4.462473f, -4.529138f, 0.2189499f, 3.807502f, 0.1693755f,
-                -0.4716486f, -1.000425f, 0.9232992f, -3.673697f, 0.6259388f, 1.672141f, -2.982634f, 1.078195f,
-                -2.848732f, -0.5303007f, -3.71349f, -2.054001f
-            };
-            m_PositionIndicator.AddDataPointList(m_DataProviders[1].DataPointPositions);
-
-
-            builder.Append("]");
-
-
-            // for (int i = 0; i < 20; i++)
-            // {
-            //     m_DataProviders[1].AddDataPoint((Random.value * 10) - 5);
-            //     builder.Append(m_DataProviders[1].Dataset[i] + ", ");
-            // }
-
-            builder.Append("]");
-            Debug.Log(builder.ToString());
-
-            MarkDirtyRepaint();
-        }
-
+        
         public void AddDataProvider(DataProvider provider)
         {
             m_DataProviders.Add(provider);

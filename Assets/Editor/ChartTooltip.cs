@@ -132,7 +132,6 @@ namespace UnityChart.Editor
         {
             var painterSnapshot = new PainterSnapshot
                 { FillColor = painter.fillColor, StrokeColor = painter.strokeColor, Width = painter.lineWidth };
-            Debug.Log(indicatorX);
 
             painter.BeginPath();
             painter.lineWidth = 1f;

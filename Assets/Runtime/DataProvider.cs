@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -19,10 +20,17 @@ namespace UnityChart.Runtime
                 {
                     DataPointPositions.Add(new Vector2());
                 }
+                OnDataChanged?.Invoke();
             }
             get => m_Dataset;
         }
-        public List<Vector2> DataPointPositions; 
+
+
+        public List<Vector2> DataPointPositions;
+        public event Action OnDataChanged;
+
+        private string m_ID;
+        public string ID => m_ID;
 
         private Color m_Color;
         public Color Color => m_Color;
@@ -59,15 +67,17 @@ namespace UnityChart.Runtime
             return m_LastMin;
         }
 
-        public DataProvider(Color color, string name)
+        public DataProvider(Color color, string name, string id)
         {
             m_Dataset = new List<float>();
             DataPointPositions = new List<Vector2>();
             m_Color = color;
             m_Name = name;
+            m_ID = id;
 
             m_IsLastMaxValid = false;
             m_IsLastMinValid = false;
+            DataProviderRegistry.instance.AddDataProvider(this);
         }
 
         public void AddDataPoint(float value)
@@ -79,6 +89,7 @@ namespace UnityChart.Runtime
             if (value > m_LastMax)
                 m_IsLastMaxValid = false;
             DataPointPositions.Add(new Vector2());
+            OnDataChanged?.Invoke();
         }
 
         public DataProviderLegend GetLegend()
@@ -92,4 +103,5 @@ namespace UnityChart.Runtime
         public Color Color;
         public string Name;
     }
+    
 }

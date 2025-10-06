@@ -1,8 +1,0 @@
-{
-	"name": "UnityChart.Editor",
-	"references": [
-		"UnityChart.Runtime"
-	],
-	"allowUnsafeCode": false,
-	"autoReferenced": true
-}
