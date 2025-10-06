@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace UnityChart
+namespace UnityChart.Runtime
 {
     public class DataProvider
     {
@@ -22,7 +22,7 @@ namespace UnityChart
             }
             get => m_Dataset;
         }
-        internal List<Vector2> DataPointPositions; 
+        public List<Vector2> DataPointPositions; 
 
         private Color m_Color;
         public Color Color => m_Color;

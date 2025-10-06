@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace UnityChart.Test
+namespace UnityChart.Editor.Test
 {
     public class ChartTest : EditorWindow
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace UnityChart
+namespace UnityChart.Editor
 {
     public class NiceScale
 {

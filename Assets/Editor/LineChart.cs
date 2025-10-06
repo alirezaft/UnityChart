@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Text;
+using UnityChart.Runtime;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace UnityChart
+namespace UnityChart.Editor
 {
     [UxmlElement]
     public partial class LineChart : VisualElement

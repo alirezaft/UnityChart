@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using UnityChart.Runtime;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace UnityChart
+namespace UnityChart.Editor
 {
     public class ChartLegend
     {

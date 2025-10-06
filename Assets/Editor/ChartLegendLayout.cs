@@ -1,6 +1,7 @@
 using UnityEngine.UIElements;
+using UnityChart.Runtime;
 
-namespace UnityChart
+namespace UnityChart.Editor
 {
     public class ChartLegendLayout
     {
