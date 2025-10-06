@@ -11,7 +11,6 @@ namespace UnityChart
         public static int GetNumberOfDigits(int n)
         {
             return (int)Math.Floor(Math.Log10(n) + 1);
-            ;
         }
         
         public static Vector2 EstimateLabelDimensionInPixels(string text, VisualElement contextElement, int fontSize,
@@ -29,7 +28,7 @@ namespace UnityChart
 
             Vector2 size = temp.MeasureTextSize(
                 text,
-                0, // no width restriction
+                0,
                 VisualElement.MeasureMode.Undefined,
                 0,
                 VisualElement.MeasureMode.Undefined

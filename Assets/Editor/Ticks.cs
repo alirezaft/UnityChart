@@ -32,8 +32,6 @@ namespace UnityChart
             m_Painter.strokeColor = Color.white;
             var tickX = m_ChartLayout.WidthOffset + m_ChartLayout.XStart;
             
-            // var currPos = startPoint;
-             
             for (float i = m_ChartLayout.YStart; i <= m_ChartLayout.ChartHeight + m_ChartLayout.YStart; i += tickDistance)
             {
                 m_Painter.BeginPath();

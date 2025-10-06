@@ -35,7 +35,6 @@ namespace UnityChart
             m_Painter.lineWidth = 2f;
 
             DrawAxisLines();
-            // DrawAxisArrows(painter);
 
             m_Painter.MoveTo(Vector2.zero);
 
@@ -47,7 +46,6 @@ namespace UnityChart
         private void DrawAxisLines()
         {
             m_Painter.strokeColor = Color.white;
-            // m_WidthOffset = m_ChartLayout.CaclulateWidthOffset()
 
             DrawVerticalAxisLine();
             DrawHorizontalAxisLine();

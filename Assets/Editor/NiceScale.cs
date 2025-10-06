@@ -26,7 +26,6 @@ namespace UnityChart
 
     private void Calculate()
     {
-        // Handle degenerate case where min == max
         if (Mathf.Approximately(minPoint, maxPoint))
         {
             range = Mathf.Abs(minPoint) > 1e-6f ? Mathf.Abs(minPoint) * 0.1f : 1f;
@@ -39,7 +38,6 @@ namespace UnityChart
 
         if (atLeastOne)
         {
-            // Clamp min at 1 if user requested integers >= 1
             niceMin = Mathf.Max(1, Mathf.Floor(minPoint / tickSpacing) * tickSpacing);
             niceMax = Mathf.Ceil(maxPoint / tickSpacing) * tickSpacing;
             if (niceMax == niceMin) niceMax += tickSpacing;
@@ -51,14 +49,11 @@ namespace UnityChart
         }
     }
 
-    /// <summary>
-    /// Produces a "nice" rounded number for the given range.
-    /// </summary>
     private float NiceNum(float range, bool round)
     {
         if (range <= 0) return 0;
 
-        float exponent = Mathf.Floor(Mathf.Log10(range));   // can be negative for small numbers
+        float exponent = Mathf.Floor(Mathf.Log10(range));
         float fraction = range / Mathf.Pow(10f, exponent);
         float niceFraction;
 
@@ -110,7 +105,6 @@ namespace UnityChart
         {
             float tick = niceMin + (i * tickSpacing);
 
-            // Avoid ugly floating-point artifacts like 1.0000001
             tick = (float)Math.Round(tick, 6, MidpointRounding.AwayFromZero);
             result.Add(tick);
         }
