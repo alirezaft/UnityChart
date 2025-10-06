@@ -19,7 +19,7 @@ namespace UnityChart
         {
             m_ChartLayout = layout;
             m_DataProviders = providers;
-            m_TooltipLayout = new ChartTooltipLayout(4f, 2f, 3f, 3f, 10f, 12f, 2f);
+            m_TooltipLayout = new ChartTooltipLayout(4f, 2f, 6f, 3f, 10f, 12f, 2f);
         }
 
         public void DrawTooltip(Painter2D painter, MeshGenerationContext ctx, int dataIndex, float indicatorX)
@@ -38,18 +38,31 @@ namespace UnityChart
             var width = GetTooltipWidth(longestLength);
 
             Vector2 boxStartPoint;
-            
-            if(isOnRight)
+
+            var titleHeight =
+                Utils.EstimateLabelDimensionInPixels(titleText, m_Chart, (int)m_TooltipLayout.TitleFontSize).y;
+
+
+            if (isOnRight)
                 boxStartPoint = new Vector2(indicatorX + (m_TooltipLayout.Margin * sign),
-                    m_ChartLayout.YStart + m_TooltipLayout.Margin); 
+                    m_ChartLayout.YStart + m_TooltipLayout.Margin);
             else
                 boxStartPoint = new Vector2(indicatorX + ((width + m_TooltipLayout.Margin) * sign),
                     m_ChartLayout.YStart + m_TooltipLayout.Margin);
-            
-            // var 
-            
+
+
             DrawTooltipBox(width, height, sign, indicatorX, painter);
-            DrawTitle(titleText, ctx, boxStartPoint, height, width);
+            DrawTitle(titleText, ctx, boxStartPoint);
+
+            var dataColors = new Color[m_DataProviders.Count];
+
+            for (var i = 0; i < m_DataProviders.Count; i++)
+            {
+                dataColors[i] = m_DataProviders[i].Color;
+            }
+
+            DrawDataTexts(dataTexts, dataColors,
+                boxStartPoint + new Vector2(0, titleHeight + m_TooltipLayout.LineSpacing), ctx, painter);
         }
 
         private bool IsToolTipOnRight(float longestLabel)
@@ -93,12 +106,11 @@ namespace UnityChart
 
             for (int i = 0; i < dataTexts.Length; i++)
             {
-                ans += Utils.EstimateLabelDimensionInPixels(dataTexts[i], m_Chart, (int)m_TooltipLayout.FontSize).y;
+                ans += Mathf.Max(m_TooltipLayout.ColorIndicatorRadius * 2,
+                    Utils.EstimateLabelDimensionInPixels(dataTexts[i], m_Chart, (int)m_TooltipLayout.FontSize).y);
 
                 if (i != dataTexts.Length - 1)
                     ans += m_TooltipLayout.LineSpacing;
-
-                ans += m_TooltipLayout.ColorIndicatorRadius * 2;
             }
 
             ans += m_TooltipLayout.Padding * 2;
@@ -110,7 +122,7 @@ namespace UnityChart
         {
             var ans = longestTextLength;
             ans += m_TooltipLayout.ColorIndicatorRadius * 2;
-            ans += m_TooltipLayout.Padding;
+            ans += m_TooltipLayout.Padding * 2;
             ans += m_TooltipLayout.ColorAndTextSapcing;
 
             return ans;
@@ -120,8 +132,8 @@ namespace UnityChart
         {
             var painterSnapshot = new PainterSnapshot
                 { FillColor = painter.fillColor, StrokeColor = painter.strokeColor, Width = painter.lineWidth };
-            Debug.Log(indicatorX);    
-            
+            Debug.Log(indicatorX);
+
             painter.BeginPath();
             painter.lineWidth = 1f;
             painter.strokeColor = new Color(0.4f, 0.4f, 0.4f, 1f);
@@ -138,18 +150,53 @@ namespace UnityChart
             painter.LineTo(currPos + new Vector2(-width * isOnRight, 0));
             currPos += new Vector2(-width * isOnRight, 0);
             painter.LineTo(currPos + new Vector2(0, -height));
-            
+
             painter.Stroke();
             painter.Fill();
             painter.ClosePath();
-            
+
             painterSnapshot.RestorePainterData(painter);
         }
 
-        private void DrawTitle(string title, MeshGenerationContext ctx, Vector2 boxBeginningPoint, float height, float width)
+        private void DrawTitle(string title, MeshGenerationContext ctx, Vector2 boxBeginningPoint)
         {
             var position = boxBeginningPoint + new Vector2(m_TooltipLayout.Padding, m_TooltipLayout.Padding);
             ctx.DrawText(title, position, m_TooltipLayout.TitleFontSize, Color.white);
+        }
+
+        private void DrawDataTexts(string[] dataTexts, Color[] colors, Vector2 startingPoint, MeshGenerationContext ctx,
+            Painter2D painter)
+        {
+            var painterSnapshot = new PainterSnapshot
+                { Width = painter.lineWidth, FillColor = painter.fillColor, StrokeColor = painter.strokeColor };
+            var currPos = startingPoint + new Vector2(m_TooltipLayout.Padding, m_TooltipLayout.LineSpacing);
+            var textPositionVector =
+                new Vector2(m_TooltipLayout.ColorIndicatorRadius + m_TooltipLayout.ColorAndTextSapcing,
+                    -m_TooltipLayout.FontSize / 1.5f);
+
+            for (int i = 0; i < dataTexts.Length; i++)
+            {
+                painter.BeginPath();
+                painter.fillColor = colors[i];
+                painter.strokeColor = colors[i];
+
+                painter.MoveTo(currPos);
+                painter.Arc(currPos + new Vector2(m_TooltipLayout.ColorIndicatorRadius, 0),
+                    m_TooltipLayout.ColorIndicatorRadius, 0, 360);
+                painter.Fill();
+                painter.Stroke();
+                painter.ClosePath();
+
+                currPos += new Vector2(2 * m_TooltipLayout.ColorIndicatorRadius + m_TooltipLayout.ColorAndTextSapcing,
+                    0);
+                ctx.DrawText(dataTexts[i], currPos + textPositionVector, m_TooltipLayout.FontSize, Color.white);
+
+                if (i != dataTexts.Length - 1)
+                    currPos = new Vector2(startingPoint.x + m_TooltipLayout.Padding,
+                        currPos.y + (m_TooltipLayout.LineSpacing + 2 * m_TooltipLayout.ColorIndicatorRadius));
+            }
+
+            painterSnapshot.RestorePainterData(painter);
         }
 
         public void UpdateMousePosition(Vector2 position)
