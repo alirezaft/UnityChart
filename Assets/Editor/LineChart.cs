@@ -23,6 +23,7 @@ namespace UnityChart.Editor
         private float m_NiceMaxY;
         private float m_NiceMinY;
         private float m_YLabelMargin = 4f;
+        private Vector2 m_NoDataLength;
 
         private float m_FontSize = 10f;
         private List<float> m_XTicks;
@@ -44,6 +45,7 @@ namespace UnityChart.Editor
             m_DataProviders = new List<DataProvider>();
             // GetDataProviders();
             generateVisualContent += DrawChart;
+            m_NoDataLength = Vector2.zero;
         }
 
         private void GetDataProviders()
@@ -56,16 +58,15 @@ namespace UnityChart.Editor
                 var provider = DataProviderRegistry.instance.GetDataProvider(id);
                 if (provider == null)
                     continue;
-                
+
                 provider.OnDataChanged += MarkDirtyRepaint;
                 m_DataProviders.Add(provider);
-                m_PositionIndicator.AddDataPointList(provider.DataPointPositions);
             }
         }
-        
+
         private string[] ParseIDs()
         {
-            return DataProviderIDs.Split(new[] { ","}, StringSplitOptions.None)
+            return DataProviderIDs.Split(new[] { "," }, StringSplitOptions.None)
                 .Select(s => s.Trim())
                 .ToArray();
         }
@@ -76,7 +77,7 @@ namespace UnityChart.Editor
             RegisterCallback<MouseMoveEvent>(UpdateTooltipPosition);
 
             RegisterCallback<MouseLeaveEvent>(ResetMouseIndicator);
-            
+
             RegisterCallback<AttachToPanelEvent>(ParseDataProviderAttribute);
             RegisterCallback<DetachFromPanelEvent>(UnsubscribeFromDataProviders);
         }
@@ -96,7 +97,6 @@ namespace UnityChart.Editor
 
         private void ParseDataProviderAttribute(AttachToPanelEvent evt)
         {
-            
         }
 
         private void UnsubscribeFromDataProviders(DetachFromPanelEvent evt)
@@ -152,12 +152,30 @@ namespace UnityChart.Editor
 
         private void DrawChart(MeshGenerationContext ctx)
         {
+            GetDataProviders();
+
+            if (m_DataProviders.Count == 0)
+            {
+                if (m_NoDataLength.Equals(Vector2.zero))
+                    m_NoDataLength = Utils.EstimateLabelDimensionInPixels("No data", this, 30);
+                ctx.DrawText("No data",
+                    new Vector2((layout.width / 2) - (m_NoDataLength.x / 2),
+                        (layout.height / 2) - (m_NoDataLength.y / 2)), 30f,
+                    new Color(0.65f, 0.65f, 0.65f));
+                return;
+            }
+
             if (!m_IsChartInitiated)
             {
                 m_IsChartInitiated = true;
                 m_ChartLayout = new ChartLayout(m_YLabelMargin, m_FontSize, this);
                 m_PositionIndicator = new MousePositionIndicator(m_ChartLayout);
-                GetDataProviders();
+
+                foreach (var provider in m_DataProviders)
+                {
+                    m_PositionIndicator.AddDataPointList(provider.DataPointPositions);
+                }
+                
                 m_Axis = new Axis(m_ChartLayout.ChartHeight, layout.width, m_ChartLayout);
                 m_DataGraph = new DataGraph(m_ChartLayout, m_Axis, m_DataProviders);
                 m_Ticks = new Ticks(m_Axis, m_DataProviders[0].Length, 4f, m_ChartLayout);
@@ -168,6 +186,7 @@ namespace UnityChart.Editor
                 RegisterChartEvents();
                 // MarkDirtyRepaint();
             }
+
             InitLayout();
             var painter = ctx.painter2D;
 
@@ -272,7 +291,7 @@ namespace UnityChart.Editor
             m_Ticks.SetPainter(painter);
             m_Ticks.PlaceTicksOnYAxis(m_YTicks.Count);
         }
-        
+
         public void AddDataProvider(DataProvider provider)
         {
             m_DataProviders.Add(provider);
