@@ -32,11 +32,12 @@ namespace UnityChart.Editor
             var titleText = $"#{dataIndex + 1}";
 
             var longestLength = FindLongestText(dataTexts, titleText);
-            var isOnRight = IsToolTipOnRight(longestLength);
-            var sign = isOnRight ? 1 : -1;
-
             var height = GetTooltipHeight(dataTexts, titleText);
             var width = GetTooltipWidth(longestLength);
+            
+            var isOnRight = IsToolTipOnRight(width, indicatorX);
+            var sign = isOnRight ? 1 : -1;
+
 
             Vector2 boxStartPoint;
 
@@ -66,11 +67,11 @@ namespace UnityChart.Editor
                 boxStartPoint + new Vector2(0, titleHeight + m_TooltipLayout.LineSpacing), ctx, painter);
         }
 
-        private bool IsToolTipOnRight(float longestLabel)
+        private bool IsToolTipOnRight(float tooltipBoxWidth, float indicatorX)
         {
-            var availableSpace = m_ChartLayout.XEnd - m_MousePosition.Value.x;
+            var availableSpace = m_ChartLayout.XEnd - indicatorX;
 
-            return availableSpace > GetTooltipWidth(longestLabel);
+            return availableSpace > tooltipBoxWidth;
         }
 
         private string[] GetDataTexts(int index)
