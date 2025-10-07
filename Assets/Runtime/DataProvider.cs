@@ -103,6 +103,14 @@ namespace UnityChart.Runtime
             OnDataChanged = null;
         }
 
+        public void Dispose()
+        {
+            DataProviderRegistry.instance.RemoveDataProvider(this);
+            ClearEventSubscriptions();
+            m_Dataset.Clear();
+            DataPointPositions.Clear();
+        }
+
         public DataProviderLegend GetLegend()
         {
             return new DataProviderLegend(){Color = m_Color, Name = m_Name};

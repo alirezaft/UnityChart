@@ -27,6 +27,9 @@ namespace UnityChart.Editor
 
             foreach (var provider in m_DataProviders)
             {
+                if(provider.Dataset.Count == 0)
+                    continue;
+                
                 var latestPointOnXAxis = offset + m_ChartLayout.XStart;
 
                 painter.BeginPath();

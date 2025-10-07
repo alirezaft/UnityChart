@@ -14,7 +14,18 @@ namespace UnityChart.Editor
     {
         private List<DataProvider> m_DataProviders;
 
-        [UxmlAttribute("data-providers")] public string DataProviderIDs;
+        private string m_DataProviderIDs;
+        [UxmlAttribute("data-providers")]
+        public string DataProviderIDs
+        {
+            get => m_DataProviderIDs;
+            set
+            {
+                m_DataProviderIDs = value;
+                DataProviderRegistry.instance.OnDataProviderRemoved += UnsubscribeFromProvider;
+                GetDataProviders();
+            }
+        }
 
         private float m_MinY;
         private float m_MaxY;
@@ -50,8 +61,9 @@ namespace UnityChart.Editor
 
         private void GetDataProviders()
         {
-            m_DataProviders.Clear();
             string[] ids = ParseIDs();
+            
+            m_DataProviders.Clear();
 
             foreach (var id in ids)
             {
@@ -66,9 +78,14 @@ namespace UnityChart.Editor
 
         private string[] ParseIDs()
         {
-            return DataProviderIDs.Split(new[] { "," }, StringSplitOptions.None)
+            return m_DataProviderIDs.Split(new[] { "," }, StringSplitOptions.None)
                 .Select(s => s.Trim())
                 .ToArray();
+        }
+
+        private void UnsubscribeFromProvider(DataProvider provider)
+        {
+            provider.OnDataChanged -= MarkDirtyRepaint;
         }
 
         private void RegisterChartEvents()
@@ -79,7 +96,7 @@ namespace UnityChart.Editor
             RegisterCallback<MouseLeaveEvent>(ResetMouseIndicator);
 
             RegisterCallback<AttachToPanelEvent>(ParseDataProviderAttribute);
-            RegisterCallback<DetachFromPanelEvent>(UnsubscribeFromDataProviders);
+            RegisterCallback<DetachFromPanelEvent>(UnsubscribeFromAllDataProviders);
         }
 
         private void ResetMouseIndicator(MouseLeaveEvent evt)
@@ -99,7 +116,7 @@ namespace UnityChart.Editor
         {
         }
 
-        private void UnsubscribeFromDataProviders(DetachFromPanelEvent evt)
+        private void UnsubscribeFromAllDataProviders(DetachFromPanelEvent evt)
         {
             foreach (var provider in m_DataProviders)
             {

@@ -82,7 +82,7 @@ namespace UnityChart.Editor
                 if (index < m_DataProviders[i].Dataset.Count)
                     ans[i] = m_DataProviders[i].Dataset[index].ToString();
                 else
-                    ans[i] = "-";
+                    ans[i] = "No data";
             }
 
             return ans;
