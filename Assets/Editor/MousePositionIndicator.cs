@@ -39,7 +39,7 @@ namespace UnityChart.Editor
             painter.lineWidth = 0.5f;
             painter.strokeColor = Color.white;
 
-            var pointList = m_DataPoints[0];
+            var pointList = GetLongestList();
             Vector2 indicatorPosition;
 
             if (m_FirstSearch)
@@ -147,6 +147,19 @@ namespace UnityChart.Editor
             m_MousePosition = null;
             m_FirstSearch = true;
             m_LastIndex = -1;
+        }
+
+        private List<Vector2> GetLongestList()
+        {
+            List<Vector2> ans = null;
+
+            foreach (var list in m_DataPoints)
+            {
+                if (ans == null || list.Count > ans.Count)
+                    ans = list;
+            }
+
+            return ans;
         }
     }
 }

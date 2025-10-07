@@ -47,6 +47,9 @@ namespace UnityChart.Runtime
         public int Length => m_Dataset.Count;
         public float MaxValue()
         {
+            if (m_Dataset.Count == 0)
+                return 0;
+            
             if(!m_IsLastMaxValid)
             {
                 m_IsLastMaxValid = true;
@@ -58,6 +61,9 @@ namespace UnityChart.Runtime
 
         public float MinValue()
         {
+            if (m_Dataset.Count == 0)
+                return 0;
+
             if(!m_IsLastMinValid)
             {
                 m_IsLastMinValid = true;
@@ -90,6 +96,11 @@ namespace UnityChart.Runtime
                 m_IsLastMaxValid = false;
             DataPointPositions.Add(new Vector2());
             OnDataChanged?.Invoke();
+        }
+
+        public void ClearEventSubscriptions()
+        {
+            OnDataChanged = null;
         }
 
         public DataProviderLegend GetLegend()

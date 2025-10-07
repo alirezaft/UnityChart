@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Data;
 using UnityChart.Runtime;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -78,7 +79,10 @@ namespace UnityChart.Editor
 
             for (int i = 0; i < ans.Length; i++)
             {
-                ans[i] = m_DataProviders[i].Dataset[index].ToString();
+                if (index < m_DataProviders[i].Dataset.Count)
+                    ans[i] = m_DataProviders[i].Dataset[index].ToString();
+                else
+                    ans[i] = "-";
             }
 
             return ans;

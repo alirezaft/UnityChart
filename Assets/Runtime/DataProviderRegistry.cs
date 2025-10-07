@@ -14,10 +14,9 @@ namespace UnityChart.Runtime
         {
             if (provider == null)
                 throw new ArgumentNullException("Data provider is null");
-            if (m_DataProviderRegistry.Count > 0 &&
-                m_DataProviderRegistry.FirstOrDefault(item => item.ID.Equals(provider.ID)) != null)
+            if (ProviderExists(provider))
                 throw new ArgumentException("A data provider with the same ID exists.");
-            
+
             m_DataProviderRegistry.Add(provider);
         }
 
@@ -25,5 +24,30 @@ namespace UnityChart.Runtime
         {
             return m_DataProviderRegistry.Find(item => item.ID.Equals(id));
         }
+
+        public bool ProviderExists(DataProvider provider)
+        {
+            return m_DataProviderRegistry.Count > 0 &&
+                   m_DataProviderRegistry.FirstOrDefault(item => item.ID.Equals(provider.ID)) != null;
+        }
+
+        public void RemoveDataProvider(DataProvider provider)
+        {
+            if (!ProviderExists(provider))
+                throw new ArgumentException("This provider is not in the registery.");
+
+            m_DataProviderRegistry.Remove(provider);
+            provider.ClearEventSubscriptions();
+        }
+
+        public void ClearRegistry()
+        {
+            foreach (var provider in m_DataProviderRegistry)
+            {
+                provider.ClearEventSubscriptions();
+            }
+            m_DataProviderRegistry.Clear();
+        }
+        
     }
 }

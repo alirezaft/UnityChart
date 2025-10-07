@@ -22,11 +22,12 @@ namespace UnityChart.Editor
 
         public void DrawDataGraphs(Painter2D painter)
         {
+            var offset = m_ChartLayout.WidthOffset;
+            var xSteps = (m_ChartLayout.AllowedWidth - offset) / (Utils.GetMaxDataProviderLength(m_DataProviders) - 1);
+
             foreach (var provider in m_DataProviders)
             {
-                var offset = m_ChartLayout.WidthOffset;
                 var latestPointOnXAxis = offset + m_ChartLayout.XStart;
-                var xSteps = (m_ChartLayout.AllowedWidth - offset) / (provider.Length - 1);
 
                 painter.BeginPath();
                 painter.lineWidth = 1f;

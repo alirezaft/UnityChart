@@ -43,7 +43,7 @@ namespace UnityChart.Editor
         {
             m_DataProviders = new List<DataProvider>();
             // GetDataProviders();
-            generateVisualContent += UpdateWithOldDataset;
+            generateVisualContent += DrawChart;
         }
 
         private void GetDataProviders()
@@ -54,8 +54,12 @@ namespace UnityChart.Editor
             foreach (var id in ids)
             {
                 var provider = DataProviderRegistry.instance.GetDataProvider(id);
+                if (provider == null)
+                    continue;
+                
                 provider.OnDataChanged += MarkDirtyRepaint;
                 m_DataProviders.Add(provider);
+                m_PositionIndicator.AddDataPointList(provider.DataPointPositions);
             }
         }
         
@@ -74,6 +78,7 @@ namespace UnityChart.Editor
             RegisterCallback<MouseLeaveEvent>(ResetMouseIndicator);
             
             RegisterCallback<AttachToPanelEvent>(ParseDataProviderAttribute);
+            RegisterCallback<DetachFromPanelEvent>(UnsubscribeFromDataProviders);
         }
 
         private void ResetMouseIndicator(MouseLeaveEvent evt)
@@ -92,6 +97,14 @@ namespace UnityChart.Editor
         private void ParseDataProviderAttribute(AttachToPanelEvent evt)
         {
             
+        }
+
+        private void UnsubscribeFromDataProviders(DetachFromPanelEvent evt)
+        {
+            foreach (var provider in m_DataProviders)
+            {
+                provider.OnDataChanged -= MarkDirtyRepaint;
+            }
         }
 
         private void UpdateTooltipPosition(MouseMoveEvent evt)
@@ -137,14 +150,14 @@ namespace UnityChart.Editor
             MarkDirtyRepaint();
         }
 
-        private void UpdateWithOldDataset(MeshGenerationContext ctx)
+        private void DrawChart(MeshGenerationContext ctx)
         {
             if (!m_IsChartInitiated)
             {
                 m_IsChartInitiated = true;
-                GetDataProviders();
                 m_ChartLayout = new ChartLayout(m_YLabelMargin, m_FontSize, this);
                 m_PositionIndicator = new MousePositionIndicator(m_ChartLayout);
+                GetDataProviders();
                 m_Axis = new Axis(m_ChartLayout.ChartHeight, layout.width, m_ChartLayout);
                 m_DataGraph = new DataGraph(m_ChartLayout, m_Axis, m_DataProviders);
                 m_Ticks = new Ticks(m_Axis, m_DataProviders[0].Length, 4f, m_ChartLayout);
