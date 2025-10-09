@@ -7,6 +7,8 @@ namespace UnityChart.Editor
 {
     public class DataGraph
     {
+        private readonly int MaxPointsBeforeClosingSpace = 2500;
+        
         private List<DataProvider> m_DataProviders;
         private float m_NiceMaxY;
         private float m_NiceMinY;
@@ -46,6 +48,8 @@ namespace UnityChart.Editor
                 provider.DataPointPositions[0] = currPos;
                 painter.LineTo(currPos);
                 var dataset = provider.Dataset;
+                var pointsAfterLastClosedSpace = 0;
+
 
                 for (int i = 1; i < dataset.Count; i++)
                 {
@@ -57,26 +61,44 @@ namespace UnityChart.Editor
                     {
                         var nextPoint = new Vector2(currPos.x + xSteps, dataPointY);
                         var intersectionPoint = FindIntersectionWithXAxis(currPos, nextPoint);
-
+                    
                         painter.LineTo(intersectionPoint);
                         painter.LineTo(new Vector2(latestPointOnXAxis, m_Axis.ZeroOnYAxis));
                         painter.ClosePath();
                         painter.Stroke();
                         painter.Fill();
-
+                    
                         painter.BeginPath();
                         painter.MoveTo(intersectionPoint);
                         painter.LineTo(new Vector2(currPos.x + xSteps, dataPointY));
-
+                    
                         currPos = new Vector2(currPos.x + xSteps, dataPointY);
                         provider.DataPointPositions[i] = currPos;
                         latestPointOnXAxis = intersectionPoint.x;
+                        pointsAfterLastClosedSpace = 1;
                     }
                     else
                     {
                         painter.LineTo(new Vector2(currPos.x + xSteps, dataPointY));
-                        currPos = new Vector2(currPos.x + xSteps, dataPointY);
                         provider.DataPointPositions[i] = currPos;
+                        pointsAfterLastClosedSpace++;
+
+                        if (pointsAfterLastClosedSpace > MaxPointsBeforeClosingSpace)
+                        {
+                            painter.LineTo(new Vector2(currPos.x + xSteps, m_Axis.ZeroOnYAxis));
+                            painter.LineTo(new Vector2(m_ChartLayout.XStart + offset, m_Axis.ZeroOnYAxis));
+                            painter.ClosePath();
+                            painter.Stroke(); 
+                            painter.Fill();
+                            
+                            painter.BeginPath();
+                            
+                            painter.MoveTo(new Vector2(currPos.x, m_Axis.ZeroOnYAxis));
+                            painter.LineTo(new Vector2(currPos.x, dataPointY));
+                            currPos = new Vector2(currPos.x + xSteps, dataPointY);
+                            pointsAfterLastClosedSpace = 1;
+                        }
+                        currPos = new Vector2(currPos.x + xSteps, dataPointY);
                     }
                 }
 
