@@ -294,8 +294,8 @@ namespace UnityChart.Editor
             var niceScaleX = new NiceScale(1, length, true);
             var niceScaleY = new NiceScale(m_MinY, m_MaxY, false);
             niceScaleY.SetMaxTicks(10);
-            m_NiceMaxY = niceScaleY.NiceMax;
-            m_NiceMinY = niceScaleY.NiceMin;
+            m_NiceMaxY = length > 1 ? niceScaleY.NiceMax : Mathf.Min(0, m_MinY);
+            m_NiceMinY = length > 1 ? niceScaleY.NiceMin : Mathf.Max(0, m_MaxY);
 
             m_XTicks = niceScaleX.GetTicks();
             m_YTicks = niceScaleY.GetTicks();

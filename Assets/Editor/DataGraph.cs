@@ -32,6 +32,12 @@ namespace UnityChart.Editor
                 if(provider.Dataset.Count == 0)
                     continue;
                 
+                if(provider.Dataset.Count == 1)
+                {
+                    DrawSingleDataPoint(painter, provider, offset);
+                    continue;
+                }
+                
                 var latestPointOnXAxis = offset + m_ChartLayout.XStart;
 
                 painter.BeginPath();
@@ -109,6 +115,31 @@ namespace UnityChart.Editor
             }
 
             painter.lineWidth = 2;
+        }
+
+        private void DrawSingleDataPoint(Painter2D painter, DataProvider provider, float offset)
+        {
+            painter.BeginPath();
+            painter.lineWidth = 1f;
+            painter.strokeColor = provider.Color;
+            painter.fillColor = new Color(provider.Color.r, provider.Color.g, provider.Color.b, 0.3f);
+            var startPoint = offset + m_ChartLayout.XStart;
+            painter.MoveTo(new Vector2(startPoint, m_Axis.ZeroOnYAxis));
+            
+            var YPos = FindValueOnChartYAxis(provider.Dataset[0],
+                m_NiceMinY,
+                m_NiceMaxY, m_ChartLayout.YStart, m_ChartLayout.ChartHeight + m_ChartLayout.YStart);
+            
+            painter.LineTo(new Vector2(startPoint, YPos));
+            painter.LineTo(new Vector2(m_ChartLayout.XEnd, YPos));
+            painter.LineTo(new Vector2(m_ChartLayout.XEnd, m_Axis.ZeroOnYAxis));
+            painter.LineTo(new Vector2(startPoint, m_Axis.ZeroOnYAxis));
+
+
+            painter.Fill();
+            painter.Stroke();
+            painter.ClosePath();
+            provider.DataPointPositions[0] = new Vector2(startPoint, YPos);
         }
 
         private Vector2 FindIntersectionWithXAxis(Vector2 point1, Vector2 point2)
