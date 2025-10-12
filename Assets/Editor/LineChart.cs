@@ -193,7 +193,7 @@ namespace UnityChart.Editor
                     m_PositionIndicator.AddDataPointList(provider.DataPointPositions);
                 }
                 
-                m_Axis = new Axis(m_ChartLayout.ChartHeight, layout.width, m_ChartLayout);
+                m_Axis = new Axis(m_ChartLayout);
                 m_DataGraph = new DataGraph(m_ChartLayout, m_Axis, m_DataProviders);
                 m_Ticks = new Ticks(m_Axis, m_DataProviders[0].Length, 4f, m_ChartLayout);
                 m_Labels = new TickLabel(m_FontSize, m_Axis, m_ChartLayout);
@@ -263,7 +263,6 @@ namespace UnityChart.Editor
         private void DrawAxes(Painter2D painter)
         {
             m_Axis.SetPainter(painter);
-            m_Axis.SetDimensions(m_ChartLayout.ChartHeight, layout.width);
             m_Axis.AllDataAreNegative(Utils.AreAllElementsNegative(m_DataProviders));
             m_Axis.AllDataArePositive(Utils.AreAllElementsPositive(m_DataProviders));
 
@@ -294,8 +293,8 @@ namespace UnityChart.Editor
             var niceScaleX = new NiceScale(1, length, true);
             var niceScaleY = new NiceScale(m_MinY, m_MaxY, false);
             niceScaleY.SetMaxTicks(10);
-            m_NiceMaxY = length > 1 ? niceScaleY.NiceMax : Mathf.Min(0, m_MinY);
-            m_NiceMinY = length > 1 ? niceScaleY.NiceMin : Mathf.Max(0, m_MaxY);
+            m_NiceMaxY = niceScaleY.NiceMax;
+            m_NiceMinY = niceScaleY.NiceMin;
 
             m_XTicks = niceScaleX.GetTicks();
             m_YTicks = niceScaleY.GetTicks();
