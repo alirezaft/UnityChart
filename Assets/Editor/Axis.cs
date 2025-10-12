@@ -6,8 +6,6 @@ namespace UnityChart.Editor
 {
     public class Axis
     {
-        private float m_Height;
-        private float m_Width;
         private float m_NiceMinY;
         private float m_NiceMaxY;
         private float m_WidthOffset;
@@ -22,10 +20,8 @@ namespace UnityChart.Editor
         private NiceScale m_Scale;
         private ChartLayout m_ChartLayout;
 
-        public Axis(float chartHeight, float chartWidth, ChartLayout layout)
+        public Axis(ChartLayout layout)
         {
-            m_Height = chartHeight;
-            m_Width = chartWidth;
             m_ChartLayout = layout;
         }
 
@@ -94,12 +90,6 @@ namespace UnityChart.Editor
         public void SetPainter(Painter2D painter)
         {
             m_Painter = painter ?? throw new NullReferenceException("Painter cannot be assigned to null.");
-        }
-
-        public void SetDimensions(float height, float width)
-        {
-            m_Height = height;
-            m_Width = width;
         }
 
         public void SetMinAndMax(float min, float max)
