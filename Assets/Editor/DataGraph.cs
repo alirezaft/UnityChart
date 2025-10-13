@@ -87,7 +87,6 @@ namespace UnityChart.Editor
                     else
                     {
                         painter.LineTo(new Vector2(currPos.x + xSteps, dataPointY));
-                        provider.DataPointPositions[i] = currPos;
                         pointsAfterLastClosedSpace++;
 
                         if (pointsAfterLastClosedSpace > MaxPointsBeforeClosingSpace)
@@ -106,6 +105,7 @@ namespace UnityChart.Editor
                             pointsAfterLastClosedSpace = 1;
                         }
                         currPos = new Vector2(currPos.x + xSteps, dataPointY);
+                        provider.DataPointPositions[i] = currPos;
                     }
                 }
 

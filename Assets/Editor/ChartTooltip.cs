@@ -18,6 +18,7 @@ namespace UnityChart.Editor
 
         public ChartTooltip(ChartLayout layout, List<DataProvider> providers, LineChart chart)
         {
+            m_Chart = chart;
             m_ChartLayout = layout;
             m_DataProviders = providers;
             m_TooltipLayout = new ChartTooltipLayout(4f, 2f, 6f, 3f, 10f, 12f, 2f);
