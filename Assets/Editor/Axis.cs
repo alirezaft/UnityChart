@@ -73,14 +73,16 @@ namespace UnityChart.Editor
             }
             else if (m_AreAllPositive)
             {
-                m_ZeroOnYAxisPosition = m_ChartLayout.YEnd;
+                m_ZeroOnYAxisPosition = m_ChartLayout.ChartHeight;
+            }
+            else
+            {
+                var t = m_NiceMaxY / (Mathf.Abs(m_NiceMinY) + m_NiceMaxY);
+                m_ZeroOnYAxisPosition = m_ChartLayout.YStart + t * m_ChartLayout.ChartHeight;
             }
 
-            float originalWidth = m_Painter.lineWidth;
+            var originalWidth = m_Painter.lineWidth;
             m_Painter.lineWidth = 1f;
-            
-            float t = m_NiceMaxY / (Mathf.Abs(m_NiceMinY) + m_NiceMaxY);
-            m_ZeroOnYAxisPosition = m_ChartLayout.YStart + t * m_ChartLayout.ChartHeight;
             
             m_Painter.MoveTo(new Vector2(m_ChartLayout.WidthOffset + m_ChartLayout.XStart, m_ZeroOnYAxisPosition));
             m_Painter.LineTo(new Vector2(m_ChartLayout.XEnd, m_ZeroOnYAxisPosition));

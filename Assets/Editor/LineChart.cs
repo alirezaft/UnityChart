@@ -303,7 +303,6 @@ namespace UnityChart.Editor
 
         private void DrawTicks(Painter2D painter, MeshGenerationContext context)
         {
-            m_Ticks.SetDimensions(m_ChartLayout.ChartHeight, layout.width);
             m_Ticks.SetPainter(painter);
             m_Ticks.PlaceTicksOnYAxis(m_YTicks.Count);
         }

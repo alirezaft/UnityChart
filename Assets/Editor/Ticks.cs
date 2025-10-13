@@ -7,8 +7,6 @@ namespace UnityChart.Editor
     public class Ticks
     {
         private float m_TickLength;
-        private float m_Height;
-        private float m_Width;
         private int m_DataLength;
 
         private Axis m_Axis;
@@ -77,12 +75,6 @@ namespace UnityChart.Editor
         public void SetPainter(Painter2D painter)
         {
             m_Painter = painter;
-        }
-
-        public void SetDimensions(float height, float width)
-        {
-            m_Height = height;
-            m_Width = width;
         }
     }
 }

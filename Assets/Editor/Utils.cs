@@ -126,7 +126,7 @@ namespace UnityChart.Editor
 
             foreach (var provider in providers)
             {
-                answer = answer & provider.Dataset.TrueForAll(item => item < 0);
+                answer &= provider.Dataset.TrueForAll(item => item < 0);
             }
 
             return answer;
@@ -138,7 +138,7 @@ namespace UnityChart.Editor
 
             foreach (var provider in providers)
             {
-                answer = answer & provider.Dataset.TrueForAll(item => item > 0);
+                answer &= provider.Dataset.TrueForAll(item => item > 0);
             }
 
             return answer;
