@@ -133,7 +133,7 @@ namespace UnityChart.Editor
         protected override Vector2 DoMeasure(float desiredWidth, MeasureMode widthMode, float desiredHeight,
             MeasureMode heightMode)
         {
-            var maxYLabelWidth = m_ChartLayout.FindLongestLabelLength(m_YTicks);
+            var maxYLabelWidth = m_ChartLayout.FindLongestLabelLength(m_YTicks, this);
             var legendHeight = m_ChartLayout.LegendHeight;
             var contentWidth = 40 + maxYLabelWidth + 300;
             var contentHeight = 20 + 200 + legendHeight;
@@ -185,7 +185,7 @@ namespace UnityChart.Editor
             if (!m_IsChartInitiated)
             {
                 m_IsChartInitiated = true;
-                m_ChartLayout = new ChartLayout(m_YLabelMargin, m_FontSize, this);
+                m_ChartLayout = new ChartLayout(m_YLabelMargin, m_FontSize);
                 m_PositionIndicator = new MousePositionIndicator(m_ChartLayout);
 
                 foreach (var provider in m_DataProviders)
@@ -298,7 +298,7 @@ namespace UnityChart.Editor
 
             m_XTicks = niceScaleX.GetTicks();
             m_YTicks = niceScaleY.GetTicks();
-            m_ChartLayout.CaclulateWidthOffset(m_YTicks);
+            m_ChartLayout.CaclulateWidthOffset(m_YTicks, this);
         }
 
         private void DrawTicks(Painter2D painter, MeshGenerationContext context)
