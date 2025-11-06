@@ -18,6 +18,9 @@ namespace UnityChart.Editor
 
     public NiceScale(float min, float max, bool atLeastOne)
     {
+        if (min > max)
+            throw new ArgumentException("min should not be greater than max");
+        
         minPoint = min;
         maxPoint = max;
         this.atLeastOne = atLeastOne;
@@ -85,6 +88,9 @@ namespace UnityChart.Editor
 
     public void SetMinMaxPoints(float min, float max)
     {
+        if (min > max)
+            throw new ArgumentException("min should not be greater than max");
+        
         minPoint = min;
         maxPoint = max;
         Calculate();
