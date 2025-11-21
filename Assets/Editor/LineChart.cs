@@ -92,6 +92,7 @@ namespace UnityChart.Editor
         {
             RegisterCallback<MouseMoveEvent>(UpdateMouseIndicatorPosition);
             RegisterCallback<MouseMoveEvent>(UpdateTooltipPosition);
+            RegisterCallback<MouseMoveEvent>(CheckMousePositionOnMoreButton);
 
             RegisterCallback<MouseLeaveEvent>(ResetMouseIndicator);
 
@@ -109,6 +110,13 @@ namespace UnityChart.Editor
         private void UpdateMouseIndicatorPosition(MouseMoveEvent evt)
         {
             m_PositionIndicator.UpdateMousePosition(evt.localMousePosition);
+            MarkDirtyRepaint();
+        }
+
+        private void CheckMousePositionOnMoreButton(MouseMoveEvent evt)
+        {
+            m_Legend.UpdateMousePosition(evt.localMousePosition);
+            
             MarkDirtyRepaint();
         }
 
@@ -251,7 +259,7 @@ namespace UnityChart.Editor
             m_Legend.SetPainter(painter);
             m_Legend.SetDimension(layout.height, layout.width);
 
-            m_Legend.DrawLegends();
+            m_Legend.DrawLegends(ctx);
         }
 
         private void DrawTooltip(Painter2D painter, MeshGenerationContext context)
@@ -305,12 +313,6 @@ namespace UnityChart.Editor
         {
             m_Ticks.SetPainter(painter);
             m_Ticks.PlaceTicksOnYAxis(m_YTicks.Count);
-        }
-
-        public void AddDataProvider(DataProvider provider)
-        {
-            m_DataProviders.Add(provider);
-            m_PositionIndicator.AddDataPointList(provider.DataPointPositions);
         }
     }
 }
