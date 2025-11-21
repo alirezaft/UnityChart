@@ -17,7 +17,9 @@ namespace UnityChart.Runtime
             if (provider == null)
                 throw new ArgumentNullException(nameof(provider)); 
             if (ProviderExists(provider))
-                throw new ArgumentException("A data provider with the same ID exists.");
+                throw new InvalidOperationException("A data provider with the same ID exists.");
+            if (provider.ID is null || provider.ID.Trim() == "")
+                throw new ArgumentNullException(nameof(provider.ID));
 
             m_DataProviderRegistry.Add(provider);
         }
@@ -39,7 +41,7 @@ namespace UnityChart.Runtime
         public void RemoveDataProvider(DataProvider provider)
         {
             if (!ProviderExists(provider))
-                throw new ArgumentException("This provider is not in the registry.");
+                throw new InvalidOperationException("This provider is not in the registry.");
 
             OnDataProviderRemoved?.Invoke(provider);
             m_DataProviderRegistry.Remove(provider);

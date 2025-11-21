@@ -139,7 +139,7 @@ namespace UnityChart.Editor
             LayoutValidator validator = new LayoutValidator(width, height, padding, border);
 
             if (!validator.ValidateLayout())
-                throw new InvalidLayoutException(errorMessage);
+                throw new InvalidLayoutException($"{errorMessage}: {height}, {width}");
         }
 
         public Rect GetChartDataArea()
