@@ -2,77 +2,80 @@ using UnityChart.Editor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public abstract class TextOverflowBox<T>
+namespace UnityChart.Editor
 {
-    private Rect? m_OverflowButtonArea;
-    private Vector2? m_MousePosition;
-
-    private float m_Width;
-    private float m_Height;
-    private bool m_IsHoveringOnOverflowButton;
-
-    protected OverflowBoxLayout m_BoxLayout;
-
-    public TextOverflowBox()
+    public abstract class TextOverflowBox<T>
     {
-        m_BoxLayout = new OverflowBoxLayout(4f, 3f);
+        private Rect? m_OverflowButtonArea;
+        private Vector2? m_MousePosition;
+
+        private float m_Width;
+        private float m_Height;
+        private bool m_IsHoveringOnOverflowButton;
+
+        protected OverflowBoxLayout m_BoxLayout;
+
+        public TextOverflowBox()
+        {
+            m_BoxLayout = new OverflowBoxLayout(4f, 3f);
+        }
+
+        public Rect DrawOverflowBox(Painter2D painter, Vector2 mousePosition)
+        {
+            var currPos = mousePosition;
+
+            var painterSnapshot = new PainterSnapshot
+                { FillColor = painter.fillColor, StrokeColor = painter.strokeColor, Width = painter.lineWidth };
+            painter.fillColor = new Color(0.22f, 0.22f, 0.22f, 1f);
+            painter.strokeColor = new Color(0.4f, 0.4f, 0.4f, 1f);
+
+            painter.BeginPath();
+
+            painter.MoveTo(currPos);
+            painter.LineTo(currPos + new Vector2(-m_Width, 0));
+            currPos += new Vector2(-m_Width, 0);
+            painter.LineTo(currPos + new Vector2(0, -m_Height));
+            currPos += new Vector2(0, -m_Height);
+            painter.LineTo(currPos + new Vector2(m_Width, 0));
+            currPos += new Vector2(m_Width, 0);
+            painter.LineTo(currPos + new Vector2(0, m_Height));
+
+            painter.Fill();
+            painter.Stroke();
+
+            painter.ClosePath();
+
+            painterSnapshot.RestorePainterData(painter);
+
+            return new Rect(mousePosition.x, mousePosition.y, -m_Width, -m_Height);
+        }
+
+        public abstract void DrawBoxContent(T[] content, Rect boxArea, MeshGenerationContext ctx);
+
+        public void SetBoxDimensions(float width, float height)
+        {
+            m_Width = width;
+            m_Height = height;
+        }
+
+        public OverflowBoxLayout GetLayout()
+        {
+            return m_BoxLayout;
+        }
     }
 
-    public Rect DrawOverflowBox(Painter2D painter, Vector2 mousePosition)
+    public class OverflowBoxLayout
     {
-        var currPos = mousePosition;
-        
-        var painterSnapshot = new PainterSnapshot
-            { FillColor = painter.fillColor, StrokeColor = painter.strokeColor, Width = painter.lineWidth };
-        painter.fillColor = new Color(0.22f, 0.22f, 0.22f, 1f);
-        painter.strokeColor = new Color(0.4f, 0.4f, 0.4f, 1f);
-        
-        painter.BeginPath();
-        
-        painter.MoveTo(currPos);
-        painter.LineTo(currPos + new Vector2(-m_Width, 0));
-        currPos += new Vector2(-m_Width, 0);
-        painter.LineTo(currPos + new Vector2(0, -m_Height));
-        currPos += new Vector2(0,  -m_Height);
-        painter.LineTo(currPos + new Vector2(m_Width, 0));
-        currPos += new Vector2(m_Width, 0);
-        painter.LineTo(currPos + new Vector2(0, m_Height));
-        
-        painter.Fill();
-        painter.Stroke();
-        
-        painter.ClosePath();
-        
-        painterSnapshot.RestorePainterData(painter);
+        private float m_BoxPadding;
+        public float BoxPadding => m_BoxPadding;
 
-        return new Rect(mousePosition.x, mousePosition.y, -m_Width, -m_Height);
-    }
+        private float m_ContentEntrySpacing;
+        public float ContentEntrySpacing => m_ContentEntrySpacing;
 
-    public abstract void DrawBoxContent(T[] content, Rect boxArea, MeshGenerationContext ctx);
-
-    public void SetBoxDimensions(float width, float height)
-    {
-        m_Width = width;
-        m_Height = height;
-    }
-
-    public OverflowBoxLayout GetLayout()
-    {
-        return m_BoxLayout;
-    }
-}
-
-public class OverflowBoxLayout
-{
-    private float m_BoxPadding;
-    public float BoxPadding => m_BoxPadding;
-    
-    private float m_ContentEntrySpacing;
-    public float ContentEntrySpacing => m_ContentEntrySpacing;
-
-    public OverflowBoxLayout(float padding, float contentEntrySpacing)
-    {
-        m_BoxPadding = padding;
-        m_ContentEntrySpacing = contentEntrySpacing;
+        public OverflowBoxLayout(float padding, float contentEntrySpacing)
+        {
+            m_BoxPadding = padding;
+            m_ContentEntrySpacing = contentEntrySpacing;
+        }
     }
 }

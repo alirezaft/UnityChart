@@ -3,45 +3,49 @@ using UnityChart.Runtime;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class LegendOverflowBox : TextOverflowBox<DataProviderLegend>
+namespace UnityChart.Editor
 {
-    private ChartLegendLayout m_LegendLayout;
-
-    public LegendOverflowBox(ChartLegendLayout layout) : base()
+    public class LegendOverflowBox : TextOverflowBox<DataProviderLegend>
     {
-        m_LegendLayout = layout;
-        Debug.Log(m_BoxLayout);
-    }
+        private ChartLegendLayout m_LegendLayout;
 
-    public override void DrawBoxContent(DataProviderLegend[] content, Rect boxArea, MeshGenerationContext ctx)
-    {
-        var painter = ctx.painter2D;
-
-        var painterSnapshot = new PainterSnapshot
-            { FillColor = painter.fillColor, StrokeColor = painter.strokeColor, Width = painter.lineWidth };
-        var currPos = new Vector2(boxArea.x + boxArea.width + m_BoxLayout.BoxPadding + m_LegendLayout.ColorIndicatorRadius,
-            boxArea.y + boxArea.height + m_BoxLayout.BoxPadding + m_LegendLayout.ColorIndicatorRadius);
-
-        for (int i = 0; i < content.Length; i++)
+        public LegendOverflowBox(ChartLegendLayout layout) : base()
         {
-            painter.BeginPath();
-            painter.fillColor = content[i].Color;
-            painter.strokeColor = content[i].Color;
+            m_LegendLayout = layout;
+            Debug.Log(m_BoxLayout);
+        }
 
-            painter.MoveTo(currPos);
-            painter.Arc(currPos, m_LegendLayout.ColorIndicatorRadius, 0, 360);
-            painter.Fill();
-            painter.Stroke();
+        public override void DrawBoxContent(DataProviderLegend[] content, Rect boxArea, MeshGenerationContext ctx)
+        {
+            var painter = ctx.painter2D;
 
-            painter.ClosePath();
-            painterSnapshot.RestorePainterData(painter);
+            var painterSnapshot = new PainterSnapshot
+                { FillColor = painter.fillColor, StrokeColor = painter.strokeColor, Width = painter.lineWidth };
+            var currPos = new Vector2(
+                boxArea.x + boxArea.width + m_BoxLayout.BoxPadding + m_LegendLayout.ColorIndicatorRadius,
+                boxArea.y + boxArea.height + m_BoxLayout.BoxPadding + m_LegendLayout.ColorIndicatorRadius);
 
-            ctx.DrawText(content[i].Name,
-                new Vector2(currPos.x + m_LegendLayout.TextAndColorSpacing + m_LegendLayout.ColorIndicatorRadius,
-                    currPos.y - m_LegendLayout.Fontsize / 1.5f),
-                m_LegendLayout.Fontsize, Color.white);
+            for (int i = 0; i < content.Length; i++)
+            {
+                painter.BeginPath();
+                painter.fillColor = content[i].Color;
+                painter.strokeColor = content[i].Color;
 
-            currPos += new Vector2(0, m_LegendLayout.LegendSpacing);
+                painter.MoveTo(currPos);
+                painter.Arc(currPos, m_LegendLayout.ColorIndicatorRadius, 0, 360);
+                painter.Fill();
+                painter.Stroke();
+
+                painter.ClosePath();
+                painterSnapshot.RestorePainterData(painter);
+
+                ctx.DrawText(content[i].Name,
+                    new Vector2(currPos.x + m_LegendLayout.TextAndColorSpacing + m_LegendLayout.ColorIndicatorRadius,
+                        currPos.y - m_LegendLayout.Fontsize / 1.5f),
+                    m_LegendLayout.Fontsize, Color.white);
+
+                currPos += new Vector2(0, m_LegendLayout.LegendSpacing);
+            }
         }
     }
 }
