@@ -37,15 +37,17 @@ namespace UnityChart.Editor
                 painter.Stroke();
 
                 painter.ClosePath();
-                painterSnapshot.RestorePainterData(painter);
+                // painterSnapshot.RestorePainterData(painter);
 
                 ctx.DrawText(content[i].Name,
                     new Vector2(currPos.x + m_LegendLayout.TextAndColorSpacing + m_LegendLayout.ColorIndicatorRadius,
                         currPos.y - m_LegendLayout.Fontsize / 1.5f),
                     m_LegendLayout.Fontsize, Color.white);
 
-                currPos += new Vector2(0, m_LegendLayout.LegendSpacing);
+                currPos += new Vector2(0, m_BoxLayout.ContentEntrySpacing + m_LegendLayout.ColorIndicatorRadius * 2);
             }
+            
+            painterSnapshot.RestorePainterData(painter);
         }
     }
 }

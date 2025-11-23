@@ -54,13 +54,11 @@ namespace UnityChart.Editor
                 -m_LegendLayout.Fontsize / 1.5f
             );
 
-// Draw visible legends
             for (int i = 0; i < visibleLegendsCount; i++)
             {
                 DrawLegendEntry(m_Legends[i], ref currPos, textPos);
             }
 
-// Draw "+ N more"
             if (hiddenLegendsCount > 0)
             {
                 m_HiddenLegendsCount = hiddenLegendsCount;
@@ -102,7 +100,6 @@ namespace UnityChart.Editor
         {
             float allowed = m_ChartLayout.AllowedWidth - m_LegendLayout.LegendMargin * 2;
 
-            // Width of “+ N more”
             string moreText = $"+ {m_Legends.Count} more";
             float moreWidth = Utils.EstimateLabelDimensionInPixels(
                 moreText,
@@ -117,7 +114,6 @@ namespace UnityChart.Editor
             {
                 float w = m_LegendLayout.EstimateLegendWidth(m_Legends[i]);
 
-                // Would adding this legend + “more” overflow?
                 if (used + w + m_LegendLayout.LegendSpacing + moreWidth > allowed)
                     break;
 
@@ -135,7 +131,6 @@ namespace UnityChart.Editor
         {
             float width = m_LegendLayout.EstimateLegendWidth(legend);
 
-            // Draw indicator circle
             m_Painter.MoveTo(pos);
             m_Painter.fillColor = legend.Color;
             m_Painter.strokeColor = legend.Color;
@@ -145,10 +140,8 @@ namespace UnityChart.Editor
             m_Painter.Stroke();
             m_Painter.ClosePath();
 
-            // Draw text
             m_Context.DrawText(legend.Name, pos + textOffset, (int)m_LegendLayout.Fontsize, Color.white);
 
-            // Move cursor forward
             pos += new Vector2(
                 width + m_LegendLayout.LegendSpacing - m_LegendLayout.ColorIndicatorRadius / 2,
                 0
@@ -178,7 +171,7 @@ namespace UnityChart.Editor
 
             var height = boxPadding * 2 +
                          m_LegendLayout.ColorIndicatorRadius * hiddenLegends.Length * 2 +
-                         m_LegendLayout.LegendSpacing * (hiddenLegends.Length - 1);
+                         m_OverflowBox.GetLayout().ContentEntrySpacing * (hiddenLegends.Length - 1);
             
             var width = m_LegendLayout.GetLongestLegendWidth(hiddenLegends) + boxPadding * 2 +
                         m_LegendLayout.ColorIndicatorRadius * 2;

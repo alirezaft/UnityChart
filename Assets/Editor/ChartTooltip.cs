@@ -21,7 +21,7 @@ namespace UnityChart.Editor
             m_Chart = chart;
             m_ChartLayout = layout;
             m_DataProviders = providers;
-            m_TooltipLayout = new ChartTooltipLayout(4f, 2f, 6f, 3f, 10f, 12f, 2f);
+            m_TooltipLayout = new ChartTooltipLayout(8f, 2f, 8f, 3f, 10f, 12f, 2f);
         }
 
         public void DrawTooltip(Painter2D painter, MeshGenerationContext ctx, int dataIndex, float indicatorX)
@@ -35,7 +35,7 @@ namespace UnityChart.Editor
             var longestLength = FindLongestText(dataTexts, titleText);
             var height = GetTooltipHeight(dataTexts, titleText);
             var width = GetTooltipWidth(longestLength);
-            
+
             var isOnRight = IsToolTipOnRight(width, indicatorX);
             var sign = isOnRight ? 1 : -1;
 
@@ -107,21 +107,11 @@ namespace UnityChart.Editor
 
         private float GetTooltipHeight(string[] dataTexts, string title)
         {
-            var ans = Utils
-                .EstimateLabelDimensionInPixels(title, m_Chart, (int)m_TooltipLayout.TitleFontSize, FontStyle.Bold).y;
 
-            for (int i = 0; i < dataTexts.Length; i++)
-            {
-                ans += Mathf.Max(m_TooltipLayout.ColorIndicatorRadius * 2,
-                    Utils.EstimateLabelDimensionInPixels(dataTexts[i], m_Chart, (int)m_TooltipLayout.FontSize).y);
+             return m_TooltipLayout.ColorIndicatorRadius * 2 * dataTexts.Length +
+                    m_TooltipLayout.LineSpacing * dataTexts.Length + m_TooltipLayout.Padding * 2 +
+                      Utils.EstimateLabelDimensionInPixels(title, m_Chart, (int) m_TooltipLayout.TitleFontSize, FontStyle.Bold).y;
 
-                if (i != dataTexts.Length - 1)
-                    ans += m_TooltipLayout.LineSpacing;
-            }
-
-            ans += m_TooltipLayout.Padding * 2;
-
-            return ans;
         }
 
         private float GetTooltipWidth(float longestTextLength)

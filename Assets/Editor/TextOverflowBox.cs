@@ -17,7 +17,7 @@ namespace UnityChart.Editor
 
         public TextOverflowBox()
         {
-            m_BoxLayout = new OverflowBoxLayout(4f, 3f);
+            m_BoxLayout = new OverflowBoxLayout(8f, 8f);
         }
 
         public Rect DrawOverflowBox(Painter2D painter, Vector2 mousePosition)
@@ -26,6 +26,8 @@ namespace UnityChart.Editor
 
             var painterSnapshot = new PainterSnapshot
                 { FillColor = painter.fillColor, StrokeColor = painter.strokeColor, Width = painter.lineWidth };
+            
+            painter.lineWidth = 1f;
             painter.fillColor = new Color(0.22f, 0.22f, 0.22f, 1f);
             painter.strokeColor = new Color(0.4f, 0.4f, 0.4f, 1f);
 
