@@ -173,7 +173,7 @@ namespace UnityChart.Editor
 
         public void DrawOverflowBox(MeshGenerationContext ctx, Vector2 mousePos)
         {
-            var hiddenLegends = m_Legends.Skip(m_HiddenLegendsCount).ToArray();
+            var hiddenLegends = m_Legends.Skip(m_Legends.Count - m_HiddenLegendsCount).ToArray();
             var boxPadding = m_OverflowBox.GetLayout().BoxPadding;
 
             var height = boxPadding * 2 +
