@@ -9,10 +9,10 @@ namespace UnityChart.Runtime
     public class DataProviderRegistry : ScriptableSingleton<DataProviderRegistry>
     {
         private List<DataProvider> m_DataProviderRegistry = new List<DataProvider>();
-        public event Action<DataProvider> OnDataProviderRemoved;
-        public event Action<DataProvider> OnDataProviderAdded;
+        internal event Action<DataProvider> OnDataProviderRemoved;
+        internal event Action<DataProvider> OnDataProviderAdded;
 
-        public void AddDataProvider(DataProvider provider)
+        internal void AddDataProvider(DataProvider provider)
         {
             if (provider == null)
                 throw new ArgumentNullException(nameof(provider)); 
@@ -22,6 +22,7 @@ namespace UnityChart.Runtime
                 throw new ArgumentNullException(nameof(provider.ID));
 
             m_DataProviderRegistry.Add(provider);
+            OnDataProviderAdded?.Invoke(provider);
         }
 
         public DataProvider GetDataProvider(string id)
@@ -38,7 +39,7 @@ namespace UnityChart.Runtime
                    m_DataProviderRegistry.FirstOrDefault(item => item.ID.Equals(provider.ID)) != null;
         }
 
-        public void RemoveDataProvider(DataProvider provider)
+        internal void RemoveDataProvider(DataProvider provider)
         {
             if (!ProviderExists(provider))
                 throw new InvalidOperationException("This provider is not in the registry.");

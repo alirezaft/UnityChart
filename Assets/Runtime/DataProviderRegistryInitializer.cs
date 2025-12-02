@@ -16,7 +16,6 @@ namespace UnityChart.Runtime
             if(state != PlayModeStateChange.ExitingEditMode)
                 return;
             
-            Debug.Log("Restart before play mode");
             DataProviderRegistry.instance.ClearRegistry();
         }
     }

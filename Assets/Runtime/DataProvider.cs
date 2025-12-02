@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace UnityChart.Runtime
@@ -26,8 +27,8 @@ namespace UnityChart.Runtime
         }
 
 
-        public List<Vector2> DataPointPositions;
-        public event Action OnDataChanged;
+        internal List<Vector2> DataPointPositions;
+        internal event Action OnDataChanged;
 
         private string m_ID;
         public string ID => m_ID;
@@ -98,7 +99,7 @@ namespace UnityChart.Runtime
             OnDataChanged?.Invoke();
         }
 
-        public void ClearEventSubscriptions()
+        internal void ClearEventSubscriptions()
         {
             OnDataChanged = null;
         }

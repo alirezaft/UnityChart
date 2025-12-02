@@ -57,6 +57,15 @@ namespace UnityChart.Editor
             // GetDataProviders();
             generateVisualContent += DrawChart;
             m_NoDataLength = Vector2.zero;
+            DataProviderRegistry.instance.OnDataProviderAdded += OnDataProviderAdded;
+        }
+
+        private void OnDataProviderAdded(DataProvider provider)
+        {
+            var IDs = ParseIDs();
+            
+            if(IDs.Contains(provider.ID))
+                AddDataProvider(provider);  
         }
 
         private void GetDataProviders()
@@ -71,9 +80,14 @@ namespace UnityChart.Editor
                 if (provider == null)
                     continue;
 
-                provider.OnDataChanged += MarkDirtyRepaint;
-                m_DataProviders.Add(provider);
+                AddDataProvider(provider);
             }
+        }
+
+        private void AddDataProvider(DataProvider provider)
+        {
+            provider.OnDataChanged += MarkDirtyRepaint;
+            m_DataProviders.Add(provider);
         }
 
         private string[] ParseIDs()
