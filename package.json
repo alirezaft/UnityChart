@@ -1,0 +1,19 @@
+{
+  "name": "com.alirezaft.UnityChart",
+  "version": "0.1",
+  "displayName": "UnityChart",
+  "description": "Visualize your data in your editor tools fast and easily!",
+  "unity": "6000.0.30",
+  "documentationUrl": "https://alirezaft.github.io/UnityChart/",
+  "keywords": [
+    "chart",
+    "charting",
+    "data visualization",
+    "line chart",
+    "UI",
+    "Editor Tools",
+    "UXML",
+    "UI Toolkit"
+  ]
+}
+
