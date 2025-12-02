@@ -12,7 +12,6 @@ namespace UnityChart.Editor
         public LegendOverflowBox(ChartLegendLayout layout) : base()
         {
             m_LegendLayout = layout;
-            Debug.Log(m_BoxLayout);
         }
 
         public override void DrawBoxContent(DataProviderLegend[] content, Rect boxArea, MeshGenerationContext ctx)
@@ -37,7 +36,6 @@ namespace UnityChart.Editor
                 painter.Stroke();
 
                 painter.ClosePath();
-                // painterSnapshot.RestorePainterData(painter);
 
                 ctx.DrawText(content[i].Name,
                     new Vector2(currPos.x + m_LegendLayout.TextAndColorSpacing + m_LegendLayout.ColorIndicatorRadius,

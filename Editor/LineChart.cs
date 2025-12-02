@@ -54,7 +54,6 @@ namespace UnityChart.Editor
         public LineChart()
         {
             m_DataProviders = new List<DataProvider>();
-            // GetDataProviders();
             generateVisualContent += DrawChart;
             m_NoDataLength = Vector2.zero;
             DataProviderRegistry.instance.OnDataProviderAdded += OnDataProviderAdded;
@@ -185,7 +184,6 @@ namespace UnityChart.Editor
 
         public void DrawChart()
         {
-            //TODO: Update the old dataset
             MarkDirtyRepaint();
         }
 
@@ -223,7 +221,6 @@ namespace UnityChart.Editor
                 m_Tooltip = new ChartTooltip(m_ChartLayout, m_DataProviders, this);
 
                 RegisterChartEvents();
-                // MarkDirtyRepaint();
             }
 
             InitLayout();

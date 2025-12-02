@@ -127,7 +127,6 @@ namespace UnityChart.Editor
             var startPoint = offset + m_ChartLayout.XStart;
             painter.MoveTo(new Vector2(startPoint, m_Axis.ZeroOnYAxis));
             var xStep = (m_ChartLayout.AllowedWidth) / (length + 1);
-            // Debug.Log($"{xStep}"); 
             
             var YPos = FindValueOnChartYAxis(provider.Dataset[0],
                 m_NiceMinY,
