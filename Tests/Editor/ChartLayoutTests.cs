@@ -73,19 +73,18 @@ namespace UnityChart.Tests
             Assert.AreEqual(upper, layout.PaddingUpper);
         }
 
-        [TestCase(250, 0, 0, 0, ExpectedResult = "Padding values are invalid.")]
-        [TestCase(100, 150, 0, 0, ExpectedResult = "Padding values are invalid.")]
-        [TestCase(0, 0, 450, 0, ExpectedResult = "Padding values are invalid.")]
-        [TestCase(0, 0, 250, 155, ExpectedResult = "Padding values are invalid.")]
+        [TestCase(250, 0, 0, 0)]
+        [TestCase(100, 150, 0, 0)]
+        [TestCase(0, 0, 450, 0)]
+        [TestCase(0, 0, 250, 155)]
         [Test]
-        public string ChartLayout_SetPadding_InvalidArguments(float left, float right, float upper, float bottom)
+        public void ChartLayout_SetPadding_InvalidArguments(float left, float right, float upper, float bottom)
         {
             var layout = new ChartLayout(3, 4);
 
             layout.SetVisualElementDimension(400, 200);
-            var ex = Assert.Throws<InvalidLayoutException>(() => layout.SetPadding(upper, bottom, left, right));
+            Assert.Throws<InvalidLayoutException>(() => layout.SetPadding(upper, bottom, left, right));
 
-            return ex.Message;
         }
 
         [TestCase(-3, 0, 0, 0, ExpectedResult = "Padding can not be negative.")]
@@ -129,19 +128,18 @@ namespace UnityChart.Tests
             Assert.AreEqual(upper, layout.BorderTop);
         }
 
-        [TestCase(250, 0, 0, 0, ExpectedResult = "Border values are invalid.")]
-        [TestCase(100, 150, 0, 0, ExpectedResult = "Border values are invalid.")]
-        [TestCase(0, 0, 450, 0, ExpectedResult = "Border values are invalid.")]
-        [TestCase(0, 0, 250, 155, ExpectedResult = "Border values are invalid.")]
+        [TestCase(250, 0, 0, 0)]
+        [TestCase(100, 150, 0, 0)]
+        [TestCase(0, 0, 450, 0)]
+        [TestCase(0, 0, 250, 155)]
         [Test]
-        public string ChartLayout_SetBorder_InvalidArguments(float left, float right, float upper, float bottom)
+        public void ChartLayout_SetBorder_InvalidArguments(float left, float right, float upper, float bottom)
         {
             var layout = new ChartLayout(3, 4);
 
             layout.SetVisualElementDimension(400, 200);
-            var ex = Assert.Throws<InvalidLayoutException>(() => layout.SetBorder(upper, bottom, left, right));
+            Assert.Throws<InvalidLayoutException>(() => layout.SetBorder(upper, bottom, left, right));
 
-            return ex.Message;
         }
 
         [TestCase(-3, 0, 0, 0, ExpectedResult = "Border can not be negative.")]

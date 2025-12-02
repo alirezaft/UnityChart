@@ -40,7 +40,7 @@ public class DataProviderRegistryTests
     {
         var provider = new DataProvider(Color.blue, "provider 1", "provider");
 
-        var message = Assert.Throws<ArgumentException>(() =>
+        var message = Assert.Throws<InvalidOperationException>(() =>
         {
             var providerDuplicate = new DataProvider(Color.red, "provider 2", "provider");
         }).Message;
@@ -127,7 +127,7 @@ public class DataProviderRegistryTests
         var provider = new DataProvider(Color.blue, "provider", "provider-test");
         provider.Dispose();
 
-        var message = Assert.Throws<ArgumentException>(() => DataProviderRegistry.instance.RemoveDataProvider(provider))
+        var message = Assert.Throws<InvalidOperationException>(() => DataProviderRegistry.instance.RemoveDataProvider(provider))
             .Message;
         
         Assert.AreEqual("This provider is not in the registry.", message);
@@ -139,7 +139,7 @@ public class DataProviderRegistryTests
         var provider = new DataProvider(Color.blue, "provider", "provider-test");
         DataProviderRegistry.instance.RemoveDataProvider(provider);
         
-        var message = Assert.Throws<ArgumentException>(() => DataProviderRegistry.instance.RemoveDataProvider(provider))
+        var message = Assert.Throws<InvalidOperationException>(() => DataProviderRegistry.instance.RemoveDataProvider(provider))
             .Message;
         
         Assert.AreEqual("This provider is not in the registry.", message);
