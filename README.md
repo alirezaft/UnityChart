@@ -48,4 +48,4 @@ public class Test : MonoBehaviour
 
 ## Limitations
 * UnityChart can't handle `auto` for height and width values. If using auto for these values, you have to define a MinWidth and MinHeight for the chart visual element.
-* UnityChart is designed for play mode data visualization for now. Using it to show data in the edit mode might lead to unexpected behavior.
+* UnityChart is designed for visualizing data generated in play mode for now. Using it to show data generated in the edit mode might lead to unexpected behavior and the loss of generated data after domain reload.
