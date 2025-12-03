@@ -10,7 +10,7 @@ It helps you visualize data in real time, perfect for custom editors and inspect
 * 👨‍💻 Useful for developers tracking variables, performance metrics, or AI decisions
 * 🎮 Helpful for game designers working on economy balancing, tuning stats, or monitoring game events
 
-## Get Started
+## Resources
 
 * 👉 **[Getting Started](GetStarted.md):** Install the package and create your first chart
 * 📘 **[Documentation](api/DataProvider.md):** Learn how to use the API
