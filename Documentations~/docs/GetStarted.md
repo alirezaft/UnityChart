@@ -15,7 +15,7 @@ This guide helps you set up your first chart in just a few minutes.
 
 1. Open the **UnityChart GitHub repository** and copy the Git URL from the **Code** menu.
 2. Open **Unity Package Manager** → click **+** → select **Install package from Git URL...**
-3. Paste the URL.
+3. Paste the URL and press Install.
 
 That's it! Unity will download and install the package.
 

@@ -13,6 +13,11 @@ For API reference, guides, etc. please refer to the [Documentation](https://alir
 * 👨‍💻 Useful for developers tracking variables, performance metrics, or AI decisions
 * 🎮 Helpful for game designers working on economy balancing, tuning stats, or monitoring game events
 
+## Installation
+1. Open the UnityChart GitHub repository and copy the Git URL from the Code menu.
+2. Open Unity Package Manager → click + → select Install package from Git URL...
+3. Paste the URL and press Install.
+
 ## Example
 
 ```cs title="ExampleMonoBehaviour.cs"
