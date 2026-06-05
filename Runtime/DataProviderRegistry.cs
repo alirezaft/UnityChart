@@ -34,7 +34,7 @@ namespace UnityChart.Runtime
                 throw new ArgumentNullException(nameof(provider.ID));
 
             RemoveDeadDataProviders();
-            
+
             m_DataProviderRegistry.Add(provider);
             OnDataProviderAdded?.Invoke(provider);
         }
@@ -46,16 +46,17 @@ namespace UnityChart.Runtime
 
         public DataProvider GetDataProvider(string id, DataProviderOwner? owner = null)
         {
-            if(!DataProviderRegistryInitializer.OutsidePlayMode)
+            if (!DataProviderRegistryInitializer.OutsidePlayMode ||
+                (DataProviderRegistryInitializer.OutsidePlayMode && Application.isEditor))
             {
                 RemoveDeadDataProviders();
             }
-            
+
             if (owner is null)
                 return m_DataProviderRegistry.Find(item =>
                     item.ID.Equals(id) && item.GetOwner().scope == OwnershipScope.GlobalScope);
 
-            var ans =  m_DataProviderRegistry.Find(item =>
+            var ans = m_DataProviderRegistry.Find(item =>
                 item.ID.Equals(id) && item.GetOwner().ID.Equals(owner.Value.ID));
 
             return ans;
@@ -66,11 +67,13 @@ namespace UnityChart.Runtime
             if (provider == null)
                 throw new ArgumentNullException(nameof(provider));
 
-            
+
             return m_DataProviderRegistry.Count > 0 &&
                    m_DataProviderRegistry.FirstOrDefault(item =>
                        item.ID.Equals(provider.ID) &&
-                       item.GetOwner().ID.Equals(provider.GetOwner().owner != null ? provider.GetOwner().ID : "")) != null;
+                       item.GetOwner().ID.Equals(provider.GetOwner().scope == OwnershipScope.ComponentScope
+                           ? provider.GetOwner().ID
+                           : "")) != null;
         }
 
         internal void RemoveDataProvider(DataProvider provider)
@@ -95,7 +98,6 @@ namespace UnityChart.Runtime
             foreach (var provider in deadProviders)
             {
                 RemoveDataProvider(provider);
-                provider.Dispose();
             }
         }
 

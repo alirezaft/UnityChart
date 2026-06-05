@@ -44,11 +44,11 @@ public class DataProviderRegistryTests
         {
             var providerDuplicate = new DataProvider(Color.red, "provider 2", "provider");
         }).Message;
-        Assert.AreEqual("A data provider with the same ID exists.", message);
+        Assert.AreEqual("A data provider with the same ID with the same owner exists.", message);
     }
 
     [Test]
-    public void DataProviderRegistry_GetDataProvider_Valid()
+    public void DataProviderRegistry_GetDataProvider_GlobalScopeValid()
     {
         var provider = new DataProvider(Color.blue, "provier", "provider-test");
         var obtainedProvider = DataProviderRegistry.instance.GetDataProvider("provider-test");
@@ -188,6 +188,94 @@ public class DataProviderRegistryTests
         Assert.IsNull(RemovedDataProvider);
     }
 
+    [Test]
+    public void DataProviderRegistry_GetDataProvider_GlobalOwnerPersistence()
+    {
+        var provider = new DataProvider(Color.red, "provider", "p");
+        var ans = DataProviderRegistry.instance.GetDataProvider("p");
+        
+        Assert.AreSame(provider, ans);
+    }
+    
+    [Test]
+    public void DataProviderRegistry_GetDataProvider_ComponentOwnerPersistence()
+    {
+        var ownerGameObject = new GameObject();
+        var owner = ownerGameObject.AddComponent<TestBehaviour>();
+        
+        var provider = new DataProvider(Color.red, "provider", "p", owner);
+        var ans = DataProviderRegistry.instance.GetDataProvider("p", new DataProviderOwner(owner));
+        
+        Assert.AreSame(provider, ans);
+    }
+
+    [Test]
+    public void DataProviderRegistry_GetDataProvider_ComponentScopeSameOwner()
+    {
+        var ownerGameObject = new GameObject();
+        var owner = ownerGameObject.AddComponent<TestBehaviour>();
+
+        var provider = new DataProvider(Color.red, "provider", "p", owner);
+        var ans = DataProviderRegistry.instance.GetDataProvider("p", provider.GetOwner());
+        
+        Assert.AreSame(owner, ans.GetOwner().owner);
+    }
+
+    [Test]
+    public void DataProviderRegistry_GetDataProvider_UnregisteredOwnerReturnsNull()
+    {
+        var ownerGameObject1 = new GameObject();
+        var owner1 = ownerGameObject1.AddComponent<TestBehaviour>();
+        
+        var ownerGameObject2 = new GameObject();
+        var owner2 = ownerGameObject2.AddComponent<TestBehaviour>();
+        
+        var provider1 = new DataProvider(Color.red, "provider", "p", owner1);
+
+        var ans = DataProviderRegistry.instance.GetDataProvider("p", new DataProviderOwner(owner2));
+        
+        Assert.IsNull(ans);
+    }
+
+    [Test]
+    public void DataProviderRegistry_GetDataProvider_GlobalScopeIgnoresComponentScope()
+    {
+        var ownerGameObject = new GameObject();
+        var owner = ownerGameObject.AddComponent<TestBehaviour>();
+
+        var provider = new DataProvider(Color.red, "provider", "p", owner);
+
+        var ans = DataProviderRegistry.instance.GetDataProvider("p");
+        
+        Assert.IsNull(ans);
+    }
+
+    [Test]
+    public void DataProviderRegistry_GetDataProvider_ComponentScopeIgnoresGlobalScope()
+    {
+        var globalProvider = new DataProvider(Color.red, "provider", "p");
+        
+        var ownerGameObject = new GameObject();
+        var owner = ownerGameObject.AddComponent<TestBehaviour>();
+
+        // var componentProvider = new DataProvider(Color.red, "provider", "p", owner);
+        
+        Assert.IsNull(DataProviderRegistry.instance.GetDataProvider("p", new DataProviderOwner(owner)));
+    }
+
+    [Test]
+    public void DataProviderRegistry_RemoveDeadDataProviders_RemoveDead()
+    {
+        var ownerGameObject = new GameObject();
+        var owner = ownerGameObject.AddComponent<TestBehaviour>();
+
+        var provider = new DataProvider(Color.red, "provider", "p", owner);
+        owner.Destroy();
+
+        var ans = DataProviderRegistry.instance.GetDataProvider("p", new DataProviderOwner(owner));
+        Assert.IsNull(ans);
+    }
+    
     private void OnDataChangedTest()
     {
         OnDataChangedCalled = true;

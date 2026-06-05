@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using NUnit.Framework;
 using UnityChart.Runtime;
+using Random = UnityEngine.Random;
 
 public class DataProviderTests
 {
@@ -144,6 +146,109 @@ public class DataProviderTests
         
         Assert.AreEqual(Vector2.zero, provider.DataPointPositions[0]);
     }
+    
+    [Test]
+    public void Constructor_NullOwner_CreatesGlobalOwner()
+    {
+        var provider = new DataProvider(
+            Color.red,
+            "Health",
+            "health",
+            null);
+
+        var owner = provider.GetOwner();
+
+        Assert.AreEqual(OwnershipScope.GlobalScope, owner.scope);
+        Assert.IsNull(owner.owner);
+        Assert.AreEqual("", owner.ID);
+    }
+    
+    [Test]
+    public void Constructor_ComponentOwner_CreatesComponentScope()
+    {
+        var go = new GameObject();
+        var component = go.AddComponent<TestBehaviour>();
+
+        var provider = new DataProvider(
+            Color.red,
+            "Health",
+            "health",
+            component);
+
+        var owner = provider.GetOwner();
+
+        Assert.AreEqual(OwnershipScope.ComponentScope, owner.scope);
+        Assert.AreEqual(component, owner.owner);
+        Assert.AreEqual(component.GetInstanceID().ToString(), owner.ID);
+    }
+    
+    [Test]
+    public void DataProvider_Construtor_DifferentOwnerSameID()
+    {
+        var ownerGameObject1 = new GameObject();
+        var owner1 = ownerGameObject1.AddComponent<TestBehaviour>();
+        
+        var ownerGameObject2 = new GameObject();
+        var owner2 = ownerGameObject2.AddComponent<TestBehaviour>();
+        
+        var provider1 = new DataProvider(Color.red, "provider", "p", owner1);
+        var provider2 = new DataProvider(Color.red, "provider", "p", owner2);
+        
+        Assert.NotNull(provider1);    
+        Assert.NotNull(provider2);    
+    }
+
+    [Test]
+    public void DataProvider_Constructor_SameOwnerSameID()
+    {
+        var ownerGameObject = new GameObject();
+        var owner = ownerGameObject.AddComponent<TestBehaviour>();
+
+        var provider1 = new DataProvider(Color.red, "provider", "p", owner);
+
+        Assert.Throws<InvalidOperationException>(() => {
+            var provider2 = new DataProvider(Color.red, "provider", "p", owner);
+        });
+    }
+
+    [Test]
+    public void DataProvider_Constructor_SameMultipleGlobalID()
+    {
+        var provider1 = new DataProvider(Color.red, "provider1", "p");
+
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            var provider2 = new DataProvider(Color.blue, "provider2", "p");
+        });
+    }
+
+    [Test]
+    public void DataProvider_Constructor_SameOwnerDifferentIDs()
+    {
+        var ownerGameObject1 = new GameObject();
+        var owner1 = ownerGameObject1.AddComponent<TestBehaviour>();
+        
+        var ownerGameObject2 = new GameObject();
+        var owner2 = ownerGameObject2.AddComponent<TestBehaviour>();
+        
+        var provider1 = new DataProvider(Color.red, "provider", "p", owner1);
+        var provider2 = new DataProvider(Color.red, "provider", "p", owner2);
+    }
+
+    [Test]
+    public void DataProvider_Constructor_SameIDInGlobalAndComponentScopeValid()
+    {
+        var ownerGameObject1 = new GameObject();
+        var owner = ownerGameObject1.AddComponent<TestBehaviour>();
+
+        var provider1 = new DataProvider(Color.red, "provider", "p");
+        var provider2 = new DataProvider(Color.red, "provider", "p", owner);
+        
+        Assert.NotNull(provider2);
+    }
+    
+    
+    
 
     private void OnDataChangedTest()
     {
@@ -155,4 +260,6 @@ public class DataProviderTests
     {
         RemovedDataProvider = provider;
     }
+
+    
 }
