@@ -14,6 +14,18 @@
     "Editor Tools",
     "UXML",
     "UI Toolkit"
+  ],
+  "samples": [
+    {
+      "displayName": "Line Chart In Editor Window",
+      "description": "A simple scene and editor script showing how the line chart works in an editor window",
+      "path": "Samples~/EditorWindowLineChart"
+    },
+    {
+      "displayName": "Line Chart In Custom Inspector",
+      "description": "A simple scene and a custom inspector showing how the line chart works in a custom inspector",
+      "path": "Samples~/CustomInspectorLineChart"
+    }
   ]
 }
 

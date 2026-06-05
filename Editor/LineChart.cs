@@ -13,6 +13,7 @@ namespace UnityChart.Editor
     public partial class LineChart : VisualElement
     {
         private List<DataProvider> m_DataProviders;
+        public DataProviderOwner Owner;
 
         private string m_DataProviderIDs;
         [UxmlAttribute("data-providers")]
@@ -56,6 +57,7 @@ namespace UnityChart.Editor
             m_DataProviders = new List<DataProvider>();
             generateVisualContent += DrawChart;
             m_NoDataLength = Vector2.zero;
+            Owner = new DataProviderOwner(null);
             DataProviderRegistry.instance.OnDataProviderAdded += OnDataProviderAdded;
         }
 
@@ -75,12 +77,14 @@ namespace UnityChart.Editor
 
             foreach (var id in ids)
             {
-                var provider = DataProviderRegistry.instance.GetDataProvider(id);
+                var provider = DataProviderRegistry.instance.GetDataProvider(id, Owner.scope == OwnershipScope.GlobalScope ? null : Owner);
                 if (provider == null)
                     continue;
 
                 AddDataProvider(provider);
             }
+
+            // DataProviderRegistryInitializer.ExitingPlayMode = false;
         }
 
         private void AddDataProvider(DataProvider provider)
