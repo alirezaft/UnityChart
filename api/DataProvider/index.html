@@ -649,10 +649,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#dataprovidercolor-color-string-name-string-id" class="md-nav__link">
+  <a href="#dataprovidercolor-color-string-name-string-id-monobehaviour-ownernull" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DataProvider(Color color, string name, string id)
+        DataProvider(Color color, string name, string id, MonoBehaviour owner=null)
       
     </span>
   </a>
@@ -731,6 +731,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#getowner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GetOwner()
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -760,6 +771,62 @@
     
   
     DataProviderRegistry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DataProviderOwner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DataProviderOwner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../OwnershipScope/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OwnershipScope
   
 
     
@@ -913,10 +980,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#dataprovidercolor-color-string-name-string-id" class="md-nav__link">
+  <a href="#dataprovidercolor-color-string-name-string-id-monobehaviour-ownernull" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DataProvider(Color color, string name, string id)
+        DataProvider(Color color, string name, string id, MonoBehaviour owner=null)
       
     </span>
   </a>
@@ -995,6 +1062,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#getowner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GetOwner()
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1030,12 +1108,14 @@
 <p>A class that will feed <code>float</code> data to the chart.</p>
 <p>Use this class in your runtime code to provide data to the charts.</p>
 <h2 id="constructors">Constructors</h2>
-<h3 id="dataprovidercolor-color-string-name-string-id">DataProvider(Color color, string name, string id)</h3>
-<p>Creates a new <code>DataProvider</code>, assigning the given color, name, and ID to it.</p>
+<h3 id="dataprovidercolor-color-string-name-string-id-monobehaviour-ownernull">DataProvider(Color color, string name, string id, MonoBehaviour owner=null)</h3>
+<p>Creates a new <code>DataProvider</code>, assigning the given color, name, and ID to it. </p>
 <p><strong>Parameters</strong> </p>
 <p><code>color</code>: The color to be assigned to the data provider.</p>
 <p><code>name</code>: The name to be assigned to the data provider. This name will be shown in the legend section of the chart showing this data provider.</p>
 <p><code>id</code>: The ID to be assigned to the data provider. This ID will be used by the chart to find its data providers.</p>
+<p><code>owner</code>: The owner of the data provider. The owner will be used by the chart to find its data providers. Default value is <code>null</code> which will result in data provider belonging to the global scope with no particular owner, which is useful for providing data for editor windows.</p>
+<p>If a <code>MonoBehaviour</code> is passed, it will belong to component scope and the script will own it, which is useful for custom inspectors where several instances of a <code>MonoBehaviour</code> want ot show the same variable on their own inspector chart.</p>
 <p><strong>Throws</strong></p>
 <p><code>InvalidOperationException</code>: Thrown if a data provider with the same ID has been already created.</p>
 <p><code>ArgumentNullException</code>: Thrown if data provider ID is either null or empty.</p>
@@ -1102,6 +1182,11 @@
 <p class="admonition-title">Warning</p>
 <p>After calling <code>Dispose()</code> on a data provider, if there is a chart showing its data along with other data providers and the chart receives update from other providers, the disposed provider will disappear from the chart.</p>
 </div>
+<h3 id="getowner">GetOwner()</h3>
+<p><strong>Description</strong></p>
+<p>Returns the owner of the data provider.</p>
+<p><strong>Returns</strong></p>
+<p><code>DataProviderOwner</code> The owner of the data provider.</p>
 
 
 

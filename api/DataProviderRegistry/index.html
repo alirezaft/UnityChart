@@ -12,7 +12,7 @@
         <link rel="prev" href="../DataProvider/">
       
       
-        <link rel="next" href="../LineChart/">
+        <link rel="next" href="../DataProviderOwner/">
       
       
         
@@ -677,10 +677,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#getdataproviderstring-id" class="md-nav__link">
+  <a href="#getdataproviderstring-id-dataproviderowner-ownernull" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GetDataProvider(string id)
+        GetDataProvider(string id, DataProviderOwner? owner=null)
       
     </span>
   </a>
@@ -729,6 +729,62 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DataProviderOwner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DataProviderOwner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../OwnershipScope/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OwnershipScope
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -874,10 +930,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#getdataproviderstring-id" class="md-nav__link">
+  <a href="#getdataproviderstring-id-dataproviderowner-ownernull" class="md-nav__link">
     <span class="md-ellipsis">
       
-        GetDataProvider(string id)
+        GetDataProvider(string id, DataProviderOwner? owner=null)
       
     </span>
   </a>
@@ -951,13 +1007,14 @@
 
 <p>A class that will store all data providers and provide ways to retrieve, remove, and add data providers to it.</p>
 <h2 id="methods">Methods</h2>
-<h3 id="getdataproviderstring-id">GetDataProvider(string id)</h3>
+<h3 id="getdataproviderstring-id-dataproviderowner-ownernull">GetDataProvider(string id, DataProviderOwner? owner=null)</h3>
 <p><strong>Description</strong> </p>
-<p>Finds the data provider with the specified ID.</p>
+<p>Finds the data provider with the specified ID and owner. </p>
 <p><strong>Parameters</strong></p>
 <p><code>id</code>: The ID of the data provider to be found.</p>
+<p><code>owner</code>: The owner of the data provider to be found. The default value is <code>null</code> which results in looking up in the global scope.</p>
 <p><strong>Returns</strong></p>
-<p><code>DataProvider</code> The data provider with id. If no providers match, it will return null.</p>
+<p><code>DataProvider</code> The data provider with the given id and owner. If no providers match, it will return null.</p>
 <h3 id="providerexistsdataprovider-provider">ProviderExists(DataProvider provider)</h3>
 <p><strong>Description</strong> </p>
 <p>Checks if the given data provider exists in the registry or not.</p>
