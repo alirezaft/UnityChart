@@ -1,0 +1,17 @@
+{
+    "name": "EditorWindowSample",
+    "rootNamespace": "",
+    "references": [
+        "GUID:a67df1026f2b3ed42afd318402425461",
+        "GUID:928475be3e9ba8a408eda9b214a0f460"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
