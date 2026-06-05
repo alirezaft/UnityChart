@@ -46,8 +46,7 @@ namespace UnityChart.Runtime
 
         public DataProvider GetDataProvider(string id, DataProviderOwner? owner = null)
         {
-            if (!DataProviderRegistryInitializer.OutsidePlayMode ||
-                (DataProviderRegistryInitializer.OutsidePlayMode && Application.isEditor))
+            if (!DataProviderRegistryInitializer.OutsidePlayMode)
             {
                 RemoveDeadDataProviders();
             }
