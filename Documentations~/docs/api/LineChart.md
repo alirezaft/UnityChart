@@ -36,6 +36,7 @@ Creates a new line chart.
 |Property|Type|Description|
 |--------|----|-----------|
 |`DataProviderIDs`|`string`|Comma-separated IDs of data providers to bind to the chart. Setting this triggers chart registration.|
+|`Owner`|`DataProviderOwner`|The owner of the chart. The chart will use this to look for the data provider its supposed to show.|
 
 **Remarks**
 

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace UnityChart.Runtime
 {
     [InitializeOnLoad]
-    public static class DataProviderRegistryInitializer
+    internal static class DataProviderRegistryInitializer
     {
         public static bool OutsidePlayMode;
         

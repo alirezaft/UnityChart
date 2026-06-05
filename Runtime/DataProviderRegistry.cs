@@ -103,7 +103,6 @@ namespace UnityChart.Runtime
 
         public void ClearRegistry()
         {
-            Debug.Log("REmoving");
             foreach (var provider in m_DataProviderRegistry)
             {
                 OnDataProviderRemoved?.Invoke(provider);

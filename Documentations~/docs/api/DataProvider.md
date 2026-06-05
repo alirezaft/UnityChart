@@ -10,8 +10,8 @@ A class that will feed `float` data to the chart.
 Use this class in your runtime code to provide data to the charts.
 
 ## Constructors
-### DataProvider(Color color, string name, string id)
-Creates a new `DataProvider`, assigning the given color, name, and ID to it.
+### DataProvider(Color color, string name, string id, MonoBehaviour owner=null)
+Creates a new `DataProvider`, assigning the given color, name, and ID to it. 
 
 **Parameters** 
 
@@ -21,11 +21,16 @@ Creates a new `DataProvider`, assigning the given color, name, and ID to it.
 
 `id`: The ID to be assigned to the data provider. This ID will be used by the chart to find its data providers.
 
+`owner`: The owner of the data provider. The owner will be used by the chart to find its data providers. Default value is `null` which will result in data provider belonging to the global scope with no particular owner, which is useful for providing data for editor windows.
+
+If a `MonoBehaviour` is passed, it will belong to component scope and the script will own it, which is useful for custom inspectors where several instances of a `MonoBehaviour` want ot show the same variable on their own inspector chart.
+
 **Throws**
 
 `InvalidOperationException`: Thrown if a data provider with the same ID has been already created.
 
 `ArgumentNullException`: Thrown if data provider ID is either null or empty.
+
 
 ## Properties
 |Property|Type|Description|
@@ -71,7 +76,17 @@ Clears the `Dataset` and stops sending data updates to charts subscribed to it. 
 
 `InvalidOperationException`: Thrown if the data provider is already disposed.
 
+
 **Remarks**
 
 !!! warning
     After calling `Dispose()` on a data provider, if there is a chart showing its data along with other data providers and the chart receives update from other providers, the disposed provider will disappear from the chart.
+
+### GetOwner()
+**Description**
+
+Returns the owner of the data provider.
+
+**Returns**
+
+`DataProviderOwner` The owner of the data provider.

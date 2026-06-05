@@ -8,18 +8,20 @@
 A class that will store all data providers and provide ways to retrieve, remove, and add data providers to it.
 
 ## Methods
-### GetDataProvider(string id)
+### GetDataProvider(string id, DataProviderOwner? owner=null)
 **Description** 
 
-Finds the data provider with the specified ID.
+Finds the data provider with the specified ID and owner. 
 
 **Parameters**
 
 `id`: The ID of the data provider to be found.
 
+`owner`: The owner of the data provider to be found. The default value is `null` which results in looking up in the global scope.
+
 **Returns**
 
-`DataProvider` The data provider with id. If no providers match, it will return null.
+`DataProvider` The data provider with the given id and owner. If no providers match, it will return null.
 
 ### ProviderExists(DataProvider provider)
 **Description** 

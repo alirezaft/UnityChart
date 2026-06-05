@@ -77,14 +77,7 @@ namespace UnityChart.Runtime
 
             return m_LastMin;
         }
-
-        /// <summary>
-        /// Creates a new data provider
-        /// </summary>
-        /// <param name="color">The color for the graph of this provider shown on chart</param>
-        /// <param name="name">Name of it shown on the legend of the chart</param>
-        /// <param name="id">ID of the provider</param>
-        /// <param name="owner">Use this parameter if you are using a provider for a chart in a custom inspector</param>
+        
         public DataProvider(Color color, string name, string id, MonoBehaviour owner = null)
         {
             m_Dataset = new List<float>();
@@ -145,23 +138,27 @@ namespace UnityChart.Runtime
 
     public struct DataProviderOwner
     {
-        public MonoBehaviour owner;
-        public OwnershipScope scope;
-        public string ID;
+        private MonoBehaviour m_Owner;
+        private OwnershipScope m_Scope;
+        private string m_ID;
+        
+        public MonoBehaviour owner => m_Owner;
+        public OwnershipScope scope => m_Scope;
+        public string ID => m_ID;
 
         public DataProviderOwner(MonoBehaviour providerOwner)
         {
             if (providerOwner is not null)
             {
-                owner = providerOwner;
-                scope = OwnershipScope.ComponentScope;
-                ID = owner.GetInstanceID().ToString();
+                m_Owner = providerOwner;
+                m_Scope = OwnershipScope.ComponentScope;
+                m_ID = providerOwner.GetInstanceID().ToString();
             }
             else
             {
-                owner = null;
-                scope = OwnershipScope.GlobalScope;
-                ID = "";
+                m_Owner = null;
+                m_Scope = OwnershipScope.GlobalScope;
+                m_ID = "";
             }
         }
     }

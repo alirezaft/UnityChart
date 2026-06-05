@@ -14,6 +14,8 @@ nav:
       - Runtime:
           - DataProvider: api/DataProvider.md
           - DataProviderRegistry: api/DataProviderRegistry.md
+          - DataProviderOwner: api/DataProviderOwner.md
+          - OwnershipScope: api/OwnershipScope.md
       - Editor:
           - LineChart: api/LineChart.md
 markdown_extensions:
