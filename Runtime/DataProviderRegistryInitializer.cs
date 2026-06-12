@@ -6,24 +6,25 @@ namespace UnityChart.Runtime
     [InitializeOnLoad]
     internal static class DataProviderRegistryInitializer
     {
-        public static bool OutsidePlayMode;
+        public static PlayModeStateChange stateChange;
         
         static DataProviderRegistryInitializer()
         {
             EditorApplication.playModeStateChanged += ResetBeforePlayMode;
         }
-        
-        public static void ResetBeforePlayMode(PlayModeStateChange state)
+
+        private static void ResetBeforePlayMode(PlayModeStateChange state)
         {
+            stateChange = state;
+            
             if (state != PlayModeStateChange.ExitingEditMode)
             {
                 if(state == PlayModeStateChange.ExitingPlayMode)
-                    OutsidePlayMode = true;
+                    DataProviderRegistry.instance.MarkAllDataProvidersAsPreserve();
                 
                 return; 
             }
 
-            OutsidePlayMode = false;
             DataProviderRegistry.instance.ClearRegistry();
         }
     }

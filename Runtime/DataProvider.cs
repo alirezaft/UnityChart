@@ -31,6 +31,7 @@ namespace UnityChart.Runtime
 
         internal List<Vector2> DataPointPositions;
         internal event Action OnDataChanged;
+        internal bool PreserveFromPlayModeExit = false;
 
         private string m_ID;
         public string ID => m_ID;
@@ -127,6 +128,11 @@ namespace UnityChart.Runtime
         public DataProviderOwner GetOwner()
         {
             return m_Owner;
+        }
+
+        public bool IsOwnerDead()
+        {
+            return m_Owner.owner == null;
         }
     }
 

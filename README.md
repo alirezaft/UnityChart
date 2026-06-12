@@ -6,6 +6,8 @@ It helps you visualize data in real time, perfect for custom editors and inspect
 
 For API reference, guides, etc. please refer to the [Documentation](https://alirezaft.github.io/UnityChart/).
 
+There are samples available for showing how this library is used for editor windows and custom inspectors.
+
 ## Why UnityChart?
 
 * 🟦 **Real-time data visualization** in editor windows

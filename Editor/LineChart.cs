@@ -65,8 +65,13 @@ namespace UnityChart.Editor
         {
             var IDs = ParseIDs();
             
-            if(IDs.Contains(provider.ID))
+            if(ProviderBelongToChart(provider, IDs))
                 AddDataProvider(provider);  
+        }
+
+        private bool ProviderBelongToChart(DataProvider provider, string[] IDs)
+        {
+            return IDs.Contains(provider.ID) && (provider.GetOwner().ID == Owner.ID);
         }
 
         private void GetDataProviders()

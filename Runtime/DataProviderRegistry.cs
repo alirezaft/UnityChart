@@ -46,17 +46,20 @@ namespace UnityChart.Runtime
 
         public DataProvider GetDataProvider(string id, DataProviderOwner? owner = null)
         {
-            if (!DataProviderRegistryInitializer.OutsidePlayMode)
-            {
-                RemoveDeadDataProviders();
-            }
-
+            // RemoveDeadDataProviders();
+            
             if (owner is null)
                 return m_DataProviderRegistry.Find(item =>
                     item.ID.Equals(id) && item.GetOwner().scope == OwnershipScope.GlobalScope);
 
             var ans = m_DataProviderRegistry.Find(item =>
                 item.ID.Equals(id) && item.GetOwner().ID.Equals(owner.Value.ID));
+            
+            if(ans is not null && ans.IsOwnerDead() && !ans.PreserveFromPlayModeExit)
+            {
+                RemoveDataProvider(ans);
+                ans = null;
+            }
 
             return ans;
         }
@@ -96,7 +99,10 @@ namespace UnityChart.Runtime
 
             foreach (var provider in deadProviders)
             {
-                RemoveDataProvider(provider);
+                if (!provider.PreserveFromPlayModeExit)
+                    RemoveDataProvider(provider);
+                else
+                    provider.PreserveFromPlayModeExit = false;
             }
         }
 
@@ -109,6 +115,14 @@ namespace UnityChart.Runtime
             }
 
             m_DataProviderRegistry.Clear();
+        }
+
+        internal void MarkAllDataProvidersAsPreserve()
+        {
+            foreach (var provider in m_DataProviderRegistry)
+            {
+                provider.PreserveFromPlayModeExit = true;
+            }
         }
     }
 }
